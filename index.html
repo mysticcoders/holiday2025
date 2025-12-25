@@ -414,6 +414,12 @@
                 background: var(--terminal-green);
                 color: var(--bg-dark);
                 box-shadow: 0 0 15px var(--terminal-green);
+                cursor: pointer;
+            }
+
+            .progress-node.completed:hover {
+                transform: scale(1.1);
+                box-shadow: 0 0 25px var(--terminal-green);
             }
 
             .progress-node.current {
@@ -841,13 +847,18 @@
             id="soundPrompt"
             style="
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 min-height: 100vh;
+                gap: 20px;
             "
         >
             <button class="btn" onclick="beginExperience()">
                 [ TURN YOUR SOUND ON ]
+            </button>
+            <button id="resumeBtn" class="btn" style="display: none; border-color: var(--terminal-cyan); color: var(--terminal-cyan);" onclick="resumeProgress()">
+                [ CONTINUE WHERE YOU LEFT OFF ]
             </button>
         </div>
 
@@ -1436,22 +1447,61 @@
                 playMatrixIntro();
             }
 
-            // Debug: Check for skip to stage
-            // Usage: localStorage.setItem('skipToStage', '3') then refresh
-            document.addEventListener("DOMContentLoaded", () => {
-                const skipTo = localStorage.getItem("skipToStage");
-                if (skipTo) {
-                    const stage = parseInt(skipTo);
-                    if (stage >= 1 && stage <= 6) {
-                        document.getElementById("soundPrompt").style.display =
-                            "none";
-                        document.getElementById("stage0").style.display =
-                            "none";
-                        // goToStage will handle terminal container visibility
-                        goToStage(stage);
-                        console.log("Skipped to stage " + stage);
-                    }
+            // Progress saving with obscured stage codes (movie references)
+            const stageCodes = {
+                1: 'wopr',        // WarGames login
+                2: 'hackers',     // Hackers - Hack the Gibson
+                3: 'cosmo',       // Sneakers
+                4: 'praetorian',  // The Net
+                5: 'falken'       // WarGames tic-tac-toe
+            };
+            const codeToStage = Object.fromEntries(
+                Object.entries(stageCodes).map(([k, v]) => [v, parseInt(k)])
+            );
+
+            function saveProgress(stage) {
+                if (stage >= 1 && stage <= 5) {
+                    const code = stageCodes[stage];
+                    localStorage.setItem('mcp_' + code, 'unlocked');
+                    localStorage.setItem('mcp_current', code);
                 }
+            }
+
+            function getSavedProgress() {
+                const current = localStorage.getItem('mcp_current');
+                if (current && codeToStage[current]) {
+                    return codeToStage[current];
+                }
+                return null;
+            }
+
+            function resumeProgress() {
+                const stage = getSavedProgress();
+                if (stage) {
+                    document.getElementById("soundPrompt").style.display = "none";
+                    document.getElementById("stage0").style.display = "none";
+                    goToStage(stage);
+                    gtag('event', 'resume_progress', { event_category: 'engagement', stage_number: stage });
+                }
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const savedStage = getSavedProgress();
+                if (savedStage && savedStage > 1) {
+                    document.getElementById("resumeBtn").style.display = "block";
+                }
+
+                // Make completed progress nodes clickable
+                document.querySelectorAll('.progress-node').forEach(node => {
+                    node.addEventListener('click', () => {
+                        if (node.classList.contains('completed')) {
+                            const stage = parseInt(node.dataset.stage);
+                            if (stage && stage >= 1 && stage <= 5) {
+                                goToStage(stage);
+                            }
+                        }
+                    });
+                });
             });
 
             // Matrix rain background
@@ -1506,6 +1556,9 @@
             function goToStage(stage) {
                 const stageNames = { 1: 'binary_puzzle', 2: 'hack_the_gibson', 3: 'setec_astronomy', 4: 'dino_game', 5: 'wargames' };
                 gtag('event', 'stage_reached', { event_category: 'progression', stage_number: stage, stage_name: stageNames[stage] || 'unknown' });
+
+                // Save progress
+                saveProgress(stage);
 
                 document
                     .querySelectorAll(".stage")
