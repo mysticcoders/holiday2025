@@ -1348,6 +1348,23 @@
             let currentStage = 0;
             let loginAttempts = 0;
 
+            // Answer hashes (SHA256)
+            const HASH_STAGE1 = '51651de003ee7d32325187d7af64716b8718e8f6b068f1d6c53b810278fd4fd0';
+            const HASH_STAGE3 = '344c7ff2accfc0213e89ae3f95000861f83a3f4ba7a2263c7fc0e8ed8ea649cd';
+
+            async function hashString(str) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(str.toUpperCase().replace(/\s/g, ''));
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            async function checkAnswer(input, expectedHash) {
+                const hash = await hashString(input);
+                return hash === expectedHash;
+            }
+
             // Typewriter effect for Matrix intro
             function typeWriter(element, text, speed, callback) {
                 let i = 0;
@@ -1642,13 +1659,13 @@
             }
 
             // Stage 1: WOPR Password (WarGames)
-            function checkBinary() {
+            async function checkBinary() {
                 const input = document
                     .getElementById("binaryInput")
                     .value.toUpperCase();
                 const msgDiv = document.getElementById("binary-message");
 
-                if (input === "JOSHUA") {
+                if (await checkAnswer(input, HASH_STAGE1)) {
                     gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 1, puzzle_name: 'binary_puzzle' });
                     const falkenAudio = document.getElementById("falkenAudio");
                     const greetingText =
@@ -2300,7 +2317,6 @@
 
             // Stage 3: Setec Astronomy Anagram (Sneakers)
             const SETEC_SOURCE = "SETEC ASTRONOMY";
-            const SETEC_ANSWER = "TOO MANY SECRETS";
             let setecSourceTiles = [];
             let setecTargetTiles = [];
 
@@ -2382,15 +2398,14 @@
                 document.getElementById("setec-message").textContent = "";
             }
 
-            function checkSetec() {
+            async function checkSetec() {
                 const msgDiv = document.getElementById("setec-message");
                 const answer = setecTargetTiles.map((t) => t.char).join("");
 
                 // Remove spaces from answer for comparison
                 const cleanAnswer = answer.replace(/\s/g, "");
-                const cleanTarget = SETEC_ANSWER.replace(/\s/g, "");
 
-                if (cleanAnswer === cleanTarget) {
+                if (await checkAnswer(cleanAnswer, HASH_STAGE3)) {
                     gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 3, puzzle_name: 'setec_astronomy' });
                     msgDiv.className = "message success";
                     msgDiv.innerHTML =
