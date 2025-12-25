@@ -1676,6 +1676,7 @@
                     setTimeout(() => goToStage(2), 3500);
                 } else if (input.length > 0) {
                     loginAttempts++;
+                    gtag('event', 'login_attempt', { event_category: 'stage1', attempt_number: loginAttempts });
                     msgDiv.className = "message error";
                     msgDiv.style.border = "none";
                     msgDiv.style.background = "none";
