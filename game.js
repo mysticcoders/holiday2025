@@ -212,19 +212,9 @@ clearTimeout(id);
     };
     Runner.prototype = {
         isDisabled: function() {
-            return loadTimeData && loadTimeData.valueExists('disabledEasterEgg')
+            return false;
         },
         setupDisabledRunner: function() {
-            this.containerEl = document.createElement('div');
-            this.containerEl.className = Runner.classes.SNACKBAR;
-            this.containerEl.textContent = loadTimeData.getValue('disabledEasterEgg');
-            this.outerContainerEl.appendChild(this.containerEl);
-            document.addEventListener(Runner.events.KEYDOWN, function(e) {
-                if (Runner.keycodes.JUMP[e.keyCode]) {
-                    this.containerEl.classList.add(Runner.classes.SNACKBAR_SHOW);
-                    document.querySelector('.icon').classList.add('icon-disabled')
-                }
-            }.bind(this))
         },
         updateConfigSetting: function(setting, value) {
             if (setting in this.config && value != undefined) {
@@ -408,8 +398,8 @@ clearTimeout(id);
                 } else {
                     this.gameOver()
                 }
-                var playAcheivementSound = this.distanceMeter.update(deltaTime, Math.ceil(this.distanceRan));
-                if (playAcheivementSound) {
+                var playAchievementSound = this.distanceMeter.update(deltaTime, Math.ceil(this.distanceRan));
+                if (playAchievementSound) {
                     this.playSound(this.soundFx.SCORE)
                 }
             }
@@ -546,7 +536,7 @@ clearTimeout(id);
             vibrate(200);
             this.stop();
             this.crashed = true;
-            this.distanceMeter.acheivement = false;
+            this.distanceMeter.achievement = false;
             var cscr = document.getElementById("currentScore");
             cscr.innerText = currentScore;
             var sb = document.getElementById("shareBlock");
@@ -562,30 +552,6 @@ clearTimeout(id);
                 this.distanceMeter.setHighScore(this.highestScore);
                 currentScore = Math.round(this.highestScore * 0.025);
                 cscr.innerText = currentScore;
-                var score_d = 0;
-                if (document.getElementById("score-5") !== null) {
-                    score_d = document.getElementById("score-5").innerHTML
-                }
-                if (currentScore > score_d) {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('GET', '/inc/check.php?score=' + currentScore, false);
-                    xhr.send();
-                    if (xhr.status != 200) {} else {
-                        if (xhr.responseText != '') {
-                            if (user_name == '') {
-                                user_name = prompt(xhr.responseText, 'Anonym');
-                                if (user_name == 'null' || user_name == '') {
-                                    user_name = 'Anonym'
-                                }
-                            } else {
-                                alert(xhr.responseText)
-                            }
-                            xhr.open('GET', '/inc/set.php?name=' + user_name + '&score=' + currentScore, false);
-                            xhr.send();
-                            //location.reload()
-                        }
-                    }
-                }
             }
             this.time = getTimeStamp()
         },
@@ -959,7 +925,7 @@ clearTimeout(id);
         GRAVITY: 0.6,
         HEIGHT: 47,
         HEIGHT_DUCK: 25,
-        INIITAL_JUMP_VELOCITY: -10,
+        INITIAL_JUMP_VELOCITY: -10,
         INTRO_DURATION: 1500,
         MAX_JUMP_HEIGHT: 30,
         MIN_JUMP_HEIGHT: 30,
@@ -1013,7 +979,7 @@ clearTimeout(id);
             this.update(0, Trex.status.WAITING)
         },
         setJumpVelocity: function(setting) {
-            this.config.INIITAL_JUMP_VELOCITY = -setting;
+            this.config.INITIAL_JUMP_VELOCITY = -setting;
             this.config.DROP_VELOCITY = -setting / 2
         },
         update: function(deltaTime, opt_status) {
@@ -1083,7 +1049,7 @@ clearTimeout(id);
         startJump: function(speed) {
             if (!this.jumping) {
                 this.update(0, Trex.status.JUMPING);
-                this.jumpVelocity = this.config.INIITAL_JUMP_VELOCITY - (speed / 10);
+                this.jumpVelocity = this.config.INITIAL_JUMP_VELOCITY - (speed / 10);
                 this.jumping = true;
                 this.reachedMinHeight = false;
                 this.speedDrop = false
@@ -1152,7 +1118,7 @@ clearTimeout(id);
         this.highScore = 0;
         this.container = null;
         this.digits = [];
-        this.acheivement = false;
+        this.achievement = false;
         this.defaultString = '';
         this.flashTimer = 0;
         this.flashIterations = 0;
@@ -1220,7 +1186,7 @@ clearTimeout(id);
         update: function(deltaTime, distance) {
             var paint = true;
             var playSound = false;
-            if (!this.acheivement) {
+            if (!this.achievement) {
                 distance = this.getActualDistance(distance);
                 if (distance > this.maxScore && this.maxScoreUnits == this.config.MAX_DISTANCE_UNITS) {
                     this.maxScoreUnits++;
@@ -1230,7 +1196,7 @@ clearTimeout(id);
                 }
                 if (distance > 0) {
                     if (distance % this.config.ACHIEVEMENT_DISTANCE == 0) {
-                        this.acheivement = true;
+                        this.achievement = true;
                         this.flashTimer = 0;
                         playSound = true
                     }
@@ -1249,7 +1215,7 @@ clearTimeout(id);
                         this.flashIterations++
                     }
                 } else {
-                    this.acheivement = false;
+                    this.achievement = false;
                     this.flashIterations = 0;
                     this.flashTimer = 0
                 }
@@ -1277,7 +1243,7 @@ clearTimeout(id);
         },
         reset: function() {
             this.update(0);
-            this.acheivement = false
+            this.achievement = false
         }
     };
 
