@@ -1311,11 +1311,15 @@
                                     <p>HOW MANY PLAYERS?</p>
                                     <div style="margin-top: 20px;">
                                         <span style="color: var(--terminal-cyan);">>&nbsp;</span>
-                                        <input type="text" id="wopr-input"
+                                        <input type="text" id="wopr-input" inputmode="text" autocomplete="off" autocapitalize="off"
                                             style="background: transparent; border: none; border-bottom: 2px solid var(--terminal-green);
                                             color: var(--terminal-green); font-family: 'VT323', monospace; font-size: 24px;
                                             width: 80px; text-align: center; outline: none;"
-                                            onkeypress="handleWoprInput(event)">
+                                            onkeydown="if(event.key==='Enter')submitWoprInput()">
+                                        <button onclick="submitWoprInput()"
+                                            style="background: var(--terminal-green); color: #000; border: none;
+                                            font-family: 'VT323', monospace; font-size: 20px; padding: 5px 15px;
+                                            margin-left: 10px; cursor: pointer;">OK</button>
                                     </div>
                                 </div>
 
@@ -2599,10 +2603,10 @@
                 typeChar();
             }
 
-            function handleWoprInput(e) {
-                if (e.key !== 'Enter') return;
+            function submitWoprInput() {
                 const input = document.getElementById('wopr-input');
                 const val = input.value.trim().toLowerCase();
+                if (!val) return;
                 input.value = '';
 
                 if (val === '0' || val === 'zero') {
