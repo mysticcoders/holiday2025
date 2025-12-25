@@ -758,6 +758,74 @@
                 .pattern-grid {
                     max-width: 240px;
                 }
+                .ascii-art {
+                    font-size: 5px;
+                    overflow-x: auto;
+                }
+                .ttt-cell {
+                    width: 55px;
+                    height: 55px;
+                    font-size: 32px;
+                }
+                .scrabble-tile {
+                    width: 28px;
+                    height: 36px;
+                    font-size: 12px;
+                }
+                .terminal-title {
+                    font-size: 8px;
+                }
+                input[type="text"] {
+                    font-size: 18px;
+                    max-width: 100%;
+                }
+                .binary-display {
+                    font-size: 20px;
+                    letter-spacing: 2px;
+                }
+                .container {
+                    padding: 10px;
+                }
+                .puzzle-container {
+                    padding: 15px;
+                }
+                #wopr-terminal {
+                    font-size: 18px !important;
+                }
+                #wopr-input {
+                    font-size: 18px !important;
+                }
+                .terminal-window {
+                    border-width: 2px;
+                }
+                .status-line {
+                    font-size: 12px;
+                }
+                .mobile-text-large {
+                    font-size: 22px !important;
+                }
+            }
+
+            @media (max-width: 400px) {
+                .ttt-cell {
+                    width: 45px;
+                    height: 45px;
+                    font-size: 28px;
+                }
+                .scrabble-tile {
+                    width: 24px;
+                    height: 32px;
+                    font-size: 10px;
+                }
+                .ascii-art {
+                    display: none;
+                }
+                #wopr-terminal {
+                    font-size: 16px !important;
+                }
+                .mobile-text-large {
+                    font-size: 18px !important;
+                }
             }
         </style>
     </head>
@@ -792,10 +860,10 @@
                     padding: 40px;
                 "
             >
-                <div style="text-align: left; max-width: 600px">
+                <div style="text-align: left; max-width: 600px; padding: 0 15px;">
                     <div
                         id="matrixLine1"
-                        class="matrix-line"
+                        class="matrix-line mobile-text-large"
                         style="font-size: 32px; margin-bottom: 30px"
                     ></div>
                     <div
@@ -973,7 +1041,7 @@
                 "
             >
                 <!-- Game canvas wrapper - dino appears here -->
-                <div class="interstitial-wrapper" style="width: 600px">
+                <div class="interstitial-wrapper" style="width: 100%; max-width: 600px">
                     <!-- The game canvas will be injected here by Runner -->
                 </div>
 
@@ -1226,22 +1294,19 @@
                                 <p id="wopr-message" style="margin-bottom: 20px;"></p>
 
                                 <div id="wopr-prompt" style="display: none; margin-bottom: 20px;">
-                                    <p>PLEASE CHOOSE NUMBER OF PLAYERS:</p>
-                                    <p style="margin-top: 10px;">1 - ONE PLAYER</p>
-                                    <p>2 - TWO PLAYERS</p>
-                                    <p>0 - ZERO PLAYERS</p>
+                                    <p>HOW MANY PLAYERS?</p>
                                     <div style="margin-top: 20px;">
                                         <span style="color: var(--terminal-cyan);">>&nbsp;</span>
-                                        <input type="text" id="wopr-input" maxlength="1"
+                                        <input type="text" id="wopr-input"
                                             style="background: transparent; border: none; border-bottom: 2px solid var(--terminal-green);
                                             color: var(--terminal-green); font-family: 'VT323', monospace; font-size: 24px;
-                                            width: 40px; text-align: center; outline: none;"
+                                            width: 80px; text-align: center; outline: none;"
                                             onkeypress="handleWoprInput(event)">
                                     </div>
                                 </div>
 
                                 <div id="ttt-board" style="display: none; margin: 30px auto;">
-                                    <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px; justify-content: center;">
+                                    <div class="ttt-grid" style="display: grid; grid-template-columns: repeat(3, auto); gap: 5px; justify-content: center;">
                                         <div class="ttt-cell" data-cell="0"></div>
                                         <div class="ttt-cell" data-cell="1"></div>
                                         <div class="ttt-cell" data-cell="2"></div>
@@ -1324,14 +1389,26 @@
                                                         () => {
                                                             // Pause, play knock sound, then show button
                                                             setTimeout(() => {
-                                                                knockAudio.play();
-                                                                knockAudio.addEventListener(
-                                                                    "ended",
-                                                                    () => {
-                                                                        knockBtn.style.display =
-                                                                            "block";
-                                                                    },
-                                                                );
+                                                                // Try to play audio, but show button regardless
+                                                                let buttonShown = false;
+                                                                const showButton = () => {
+                                                                    if (!buttonShown) {
+                                                                        buttonShown = true;
+                                                                        knockBtn.style.display = "block";
+                                                                    }
+                                                                };
+
+                                                                knockAudio.play()
+                                                                    .then(() => {
+                                                                        knockAudio.addEventListener("ended", showButton);
+                                                                    })
+                                                                    .catch(() => {
+                                                                        // Audio blocked (Safari mobile), show button anyway
+                                                                        showButton();
+                                                                    });
+
+                                                                // Fallback: show button after 3 seconds regardless
+                                                                setTimeout(showButton, 3000);
                                                             }, 2000);
                                                         },
                                                     );
@@ -2442,13 +2519,16 @@
             function handleWoprInput(e) {
                 if (e.key !== 'Enter') return;
                 const input = document.getElementById('wopr-input');
-                const val = input.value.trim();
+                const val = input.value.trim().toLowerCase();
                 input.value = '';
 
-                if (val === '0') {
+                if (val === '0' || val === 'zero') {
                     endWarGames();
-                } else if (val === '1' || val === '2') {
-                    tttNumPlayers = parseInt(val);
+                } else if (val === '1' || val === 'one') {
+                    tttNumPlayers = 1;
+                    startTicTacToe();
+                } else if (val === '2' || val === 'two') {
+                    tttNumPlayers = 2;
                     startTicTacToe();
                 }
             }
