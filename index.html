@@ -1865,22 +1865,31 @@
                 switch (command) {
                     case "help":
                         printLine("");
-                        printLine(
-                            "Available commands:",
-                            "var(--terminal-amber)",
-                        );
-                        printLine("  help              Show this help message");
-                        printLine(
-                            "  man <command>     Show manual for a command",
-                        );
-                        printLine(
-                            "  nmap <host>       Scan target for open ports",
-                        );
-                        printLine(
-                            "  telnet <host> <port>  Connect to remote host",
-                        );
-                        printLine("  whoami            Display current user");
-                        printLine("  clear             Clear the terminal");
+                        if (args.length === 0) {
+                            printLine(
+                                "Available commands:",
+                                "var(--terminal-amber)",
+                            );
+                            printLine("  help [command]    Show help (try: help nmap)");
+                            printLine(
+                                "  man <command>     Show manual for a command",
+                            );
+                            printLine(
+                                "  nmap <host>       Scan target for open ports",
+                            );
+                            printLine(
+                                "  telnet <host> <port>  Connect to remote host",
+                            );
+                            printLine("  ping <host>       Ping a remote host");
+                            printLine("  whoami            Display current user");
+                            printLine("  pwd               Print working directory");
+                            printLine("  ls                List directory contents");
+                            printLine("  cat <file>        Display file contents");
+                            printLine("  history           Show command history");
+                            printLine("  clear             Clear the terminal");
+                        } else {
+                            showHelp(args[0]);
+                        }
                         printLine("");
                         break;
 
@@ -2123,6 +2132,86 @@
                         );
                 }
                 printLine("");
+            }
+
+            function showHelp(cmd) {
+                switch (cmd) {
+                    case "nmap":
+                        printLine("nmap - Network port scanner", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: nmap <host>");
+                        printLine("");
+                        printLine("HINT: The Gibson's hostname was revealed when you pinged it.");
+                        printLine("      Try: nmap gibson.ellingson.com", "var(--terminal-green-dim)");
+                        printLine("      Look for open ports in the scan results!");
+                        break;
+
+                    case "telnet":
+                        printLine("telnet - Connect to remote host", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: telnet <host> <port>");
+                        printLine("");
+                        printLine("HINT: First run nmap to find open ports on The Gibson.");
+                        printLine("      Then connect to the open port you discovered.", "var(--terminal-green-dim)");
+                        printLine("      Example: telnet gibson.ellingson.com <port>");
+                        break;
+
+                    case "ping":
+                        printLine("ping - Send ICMP echo request to host", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: ping <host>");
+                        printLine("Example: ping gibson.ellingson.com");
+                        break;
+
+                    case "whoami":
+                        printLine("whoami - Display current username", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: whoami");
+                        break;
+
+                    case "pwd":
+                        printLine("pwd - Print working directory", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: pwd");
+                        break;
+
+                    case "ls":
+                        printLine("ls - List directory contents", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: ls");
+                        break;
+
+                    case "cat":
+                        printLine("cat - Display file contents", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: cat <filename>");
+                        printLine("Example: cat notes.txt");
+                        break;
+
+                    case "history":
+                        printLine("history - Show command history", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: history");
+                        printLine("Tip: Use arrow keys to navigate history");
+                        break;
+
+                    case "clear":
+                        printLine("clear - Clear the terminal screen", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: clear");
+                        break;
+
+                    case "man":
+                        printLine("man - Display manual pages", "var(--terminal-amber)");
+                        printLine("");
+                        printLine("Usage: man <command>");
+                        printLine("Example: man nmap");
+                        break;
+
+                    default:
+                        printLine("No help available for: " + cmd, "var(--terminal-red)");
+                        printLine("Type 'help' to see all commands.", "var(--terminal-green-dim)");
+                }
             }
 
             function runPing() {
