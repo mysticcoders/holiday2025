@@ -1,0 +1,2945 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>THE EASTER EGG // CLASSIFIED</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --terminal-green: #00ff41;
+                --terminal-green-dim: #00aa2a;
+                --terminal-amber: #ffb000;
+                --terminal-red: #ff0040;
+                --terminal-cyan: #00ffff;
+                --terminal-magenta: #ff00ff;
+                --bg-dark: #0a0a0a;
+                --bg-terminal: #0d1a0d;
+                --scanline-opacity: 0.03;
+                --glow-intensity: 0.8;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            @keyframes flicker {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                92% {
+                    opacity: 1;
+                }
+                93% {
+                    opacity: 0.8;
+                }
+                94% {
+                    opacity: 1;
+                }
+                97% {
+                    opacity: 0.9;
+                }
+            }
+
+            @keyframes scanline {
+                0% {
+                    transform: translateY(-100%);
+                }
+                100% {
+                    transform: translateY(100vh);
+                }
+            }
+
+            @keyframes blink {
+                0%,
+                50% {
+                    opacity: 1;
+                }
+                51%,
+                100% {
+                    opacity: 0;
+                }
+            }
+
+            @keyframes glitch {
+                0%,
+                100% {
+                    transform: translate(0);
+                    filter: hue-rotate(0deg);
+                }
+                20% {
+                    transform: translate(-2px, 2px);
+                    filter: hue-rotate(90deg);
+                }
+                40% {
+                    transform: translate(2px, -2px);
+                    filter: hue-rotate(-90deg);
+                }
+                60% {
+                    transform: translate(-1px, -1px);
+                }
+                80% {
+                    transform: translate(1px, 1px);
+                }
+            }
+
+            @keyframes typewriter {
+                from {
+                    width: 0;
+                }
+                to {
+                    width: 100%;
+                }
+            }
+
+            @keyframes matrixRain {
+                0% {
+                    transform: translateY(-100%);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    box-shadow:
+                        0 0 5px var(--terminal-green),
+                        0 0 10px var(--terminal-green);
+                }
+                50% {
+                    box-shadow:
+                        0 0 20px var(--terminal-green),
+                        0 0 40px var(--terminal-green);
+                }
+            }
+
+            @keyframes bootup {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.95);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes staticNoise {
+                0% {
+                    background-position: 0 0;
+                }
+                100% {
+                    background-position: 100% 100%;
+                }
+            }
+
+            body {
+                font-family: "VT323", monospace;
+                background: var(--bg-dark);
+                color: var(--terminal-green);
+                min-height: 100vh;
+                overflow-x: hidden;
+                animation: flicker 5s infinite;
+            }
+
+            .crt-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1000;
+            }
+
+            .crt-overlay::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15),
+                    rgba(0, 0, 0, 0.15) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            }
+
+            .crt-overlay::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: rgba(0, 255, 65, 0.1);
+                animation: scanline 8s linear infinite;
+            }
+
+            .matrix-bg {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                overflow: hidden;
+                opacity: 0.15;
+            }
+
+            .matrix-column {
+                position: absolute;
+                top: -100%;
+                font-family: "VT323", monospace;
+                font-size: 14px;
+                color: var(--terminal-green);
+                writing-mode: vertical-rl;
+                animation: matrixRain linear infinite;
+            }
+
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 20px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .terminal-window {
+                background: linear-gradient(180deg, #1a1a2e 0%, #0d1a0d 100%);
+                border: 3px solid var(--terminal-green);
+                border-radius: 8px;
+                box-shadow:
+                    0 0 20px rgba(0, 255, 65, 0.3),
+                    inset 0 0 60px rgba(0, 255, 65, 0.05);
+                overflow: hidden;
+                animation: bootup 0.5s ease-out;
+            }
+
+            .terminal-header {
+                background: linear-gradient(90deg, #1a3a1a 0%, #0d2a0d 100%);
+                padding: 10px 15px;
+                border-bottom: 2px solid var(--terminal-green);
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .terminal-buttons {
+                display: flex;
+                gap: 8px;
+            }
+
+            .terminal-btn {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .terminal-btn.red {
+                background: #ff5f56;
+            }
+            .terminal-btn.yellow {
+                background: #ffbd2e;
+            }
+            .terminal-btn.green {
+                background: #27ca40;
+            }
+
+            .terminal-title {
+                font-family: "Press Start 2P", cursive;
+                font-size: 10px;
+                color: var(--terminal-green);
+                text-shadow: 0 0 10px var(--terminal-green);
+                flex: 1;
+                text-align: center;
+            }
+
+            .terminal-body {
+                padding: 30px;
+                min-height: 500px;
+            }
+
+            .stage {
+                display: none;
+            }
+
+            .stage.active {
+                display: block;
+                animation: bootup 0.3s ease-out;
+            }
+
+            h1,
+            h2 {
+                font-family: "Press Start 2P", cursive;
+                text-shadow: 0 0 20px var(--terminal-green);
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+            h2 {
+                font-size: 14px;
+                color: var(--terminal-amber);
+            }
+
+            .ascii-art {
+                font-size: 8px;
+                line-height: 1;
+                color: var(--terminal-green-dim);
+                margin: 20px 0;
+                white-space: pre;
+                text-align: center;
+            }
+
+            .prompt {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 20px 0;
+            }
+
+            .prompt-symbol {
+                color: var(--terminal-cyan);
+                font-size: 24px;
+            }
+
+            .cursor {
+                display: inline-block;
+                width: 10px;
+                height: 20px;
+                background: var(--terminal-green);
+                animation: blink 1s infinite;
+                vertical-align: middle;
+            }
+
+            input[type="text"] {
+                background: transparent;
+                border: none;
+                border-bottom: 2px solid var(--terminal-green);
+                color: var(--terminal-green);
+                font-family: "VT323", monospace;
+                font-size: 24px;
+                padding: 10px;
+                width: 100%;
+                max-width: 400px;
+                outline: none;
+                text-transform: uppercase;
+            }
+
+            input[type="text"]:focus {
+                border-bottom-color: var(--terminal-cyan);
+                box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3);
+            }
+
+            .btn {
+                font-family: "Press Start 2P", cursive;
+                font-size: 12px;
+                padding: 15px 30px;
+                background: transparent;
+                border: 3px solid var(--terminal-green);
+                color: var(--terminal-green);
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s;
+                text-transform: uppercase;
+            }
+
+            .btn:hover {
+                background: var(--terminal-green);
+                color: var(--bg-dark);
+                box-shadow: 0 0 30px var(--terminal-green);
+            }
+
+            .btn:active {
+                transform: scale(0.95);
+            }
+
+            .btn.locked {
+                border-color: var(--terminal-red);
+                color: var(--terminal-red);
+                cursor: not-allowed;
+            }
+
+            .progress-bar {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 30px 0;
+            }
+
+            .progress-node {
+                width: 30px;
+                height: 30px;
+                border: 2px solid var(--terminal-green-dim);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Press Start 2P", cursive;
+                font-size: 10px;
+                color: var(--terminal-green-dim);
+                position: relative;
+            }
+
+            .progress-node.completed {
+                background: var(--terminal-green);
+                color: var(--bg-dark);
+                box-shadow: 0 0 15px var(--terminal-green);
+            }
+
+            .progress-node.current {
+                border-color: var(--terminal-cyan);
+                color: var(--terminal-cyan);
+                animation: pulse 2s infinite;
+            }
+
+            .progress-connector {
+                width: 30px;
+                height: 2px;
+                background: var(--terminal-green-dim);
+                align-self: center;
+            }
+
+            .progress-connector.completed {
+                background: var(--terminal-green);
+                box-shadow: 0 0 10px var(--terminal-green);
+            }
+
+            .message {
+                padding: 15px;
+                margin: 15px 0;
+                border-left: 4px solid;
+                font-size: 18px;
+            }
+
+            .message.error {
+                border-color: var(--terminal-red);
+                color: var(--terminal-red);
+                background: rgba(255, 0, 64, 0.1);
+            }
+
+            .message.success {
+                border-color: var(--terminal-green);
+                color: var(--terminal-green);
+                background: rgba(0, 255, 65, 0.1);
+            }
+
+            .message.hint {
+                border-color: var(--terminal-amber);
+                color: var(--terminal-amber);
+                background: rgba(255, 176, 0, 0.1);
+            }
+
+            .puzzle-container {
+                background: rgba(0, 0, 0, 0.5);
+                border: 1px solid var(--terminal-green-dim);
+                padding: 25px;
+                margin: 20px 0;
+            }
+
+            .binary-display {
+                font-size: 28px;
+                letter-spacing: 5px;
+                text-align: center;
+                margin: 20px 0;
+                color: var(--terminal-cyan);
+            }
+
+            .binary-hint {
+                font-size: 16px;
+                color: var(--terminal-green-dim);
+                text-align: center;
+            }
+
+            .pattern-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                max-width: 300px;
+                margin: 30px auto;
+            }
+
+            .pattern-cell {
+                aspect-ratio: 1;
+                background: rgba(0, 255, 65, 0.1);
+                border: 2px solid var(--terminal-green-dim);
+                cursor: pointer;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Press Start 2P", cursive;
+                font-size: 20px;
+            }
+
+            .pattern-cell:hover {
+                background: rgba(0, 255, 65, 0.2);
+                border-color: var(--terminal-green);
+            }
+
+            .pattern-cell.active {
+                background: var(--terminal-green);
+                color: var(--bg-dark);
+                box-shadow: 0 0 20px var(--terminal-green);
+            }
+
+            .pattern-cell.flash {
+                animation: glitch 0.2s;
+            }
+
+            .pattern-cell.error {
+                background: var(--terminal-red);
+                border-color: var(--terminal-red);
+            }
+
+            .cipher-wheel {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .cipher-row {
+                display: flex;
+                gap: 5px;
+                font-size: 20px;
+            }
+
+            .cipher-letter {
+                width: 30px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid var(--terminal-green-dim);
+            }
+
+            .cipher-letter.highlight {
+                background: var(--terminal-green);
+                color: var(--bg-dark);
+            }
+
+            .shift-control {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .shift-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .shift-display {
+                font-family: "Press Start 2P", cursive;
+                font-size: 24px;
+                color: var(--terminal-amber);
+                min-width: 100px;
+                text-align: center;
+            }
+
+            .encrypted-message {
+                font-size: 24px;
+                letter-spacing: 3px;
+                text-align: center;
+                margin: 20px 0;
+                color: var(--terminal-magenta);
+                padding: 15px;
+                border: 2px dashed var(--terminal-magenta);
+            }
+
+            .decrypted-preview {
+                font-size: 24px;
+                letter-spacing: 3px;
+                text-align: center;
+                margin: 20px 0;
+                color: var(--terminal-cyan);
+            }
+
+            .wire-puzzle {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+                position: relative;
+            }
+
+            .wire-column {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .wire-node {
+                width: 60px;
+                height: 60px;
+                border: 3px solid var(--terminal-green);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Press Start 2P", cursive;
+                font-size: 16px;
+                cursor: pointer;
+                transition: all 0.3s;
+                background: rgba(0, 0, 0, 0.5);
+            }
+
+            .wire-node:hover {
+                box-shadow: 0 0 20px var(--terminal-green);
+            }
+
+            .wire-node.selected {
+                background: var(--terminal-cyan);
+                color: var(--bg-dark);
+                border-color: var(--terminal-cyan);
+            }
+
+            .wire-node.connected {
+                background: var(--terminal-green);
+                color: var(--bg-dark);
+            }
+
+            .wire-canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+
+            .scrabble-tile {
+                width: 44px;
+                height: 52px;
+                background: linear-gradient(180deg, #f5e6c8 0%, #e6d5a8 100%);
+                border: 2px solid #8b7355;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Press Start 2P", cursive;
+                font-size: 18px;
+                color: #2a2a2a;
+                cursor: pointer;
+                user-select: none;
+                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                transition:
+                    transform 0.15s,
+                    box-shadow 0.15s;
+            }
+
+            .scrabble-tile:hover {
+                transform: translateY(-3px);
+                box-shadow: 2px 5px 8px rgba(0, 0, 0, 0.4);
+            }
+
+            .scrabble-tile.space {
+                background: transparent;
+                border: 2px dashed var(--terminal-green-dim);
+                box-shadow: none;
+                width: 20px;
+                cursor: default;
+            }
+
+            .scrabble-tile.space:hover {
+                transform: none;
+            }
+
+            .anagram-container {
+                text-align: center;
+            }
+
+            .anagram-tiles {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                margin: 20px 0;
+            }
+
+            .anagram-tile {
+                width: 45px;
+                height: 55px;
+                background: linear-gradient(180deg, #2a2a4a 0%, #1a1a2a 100%);
+                border: 2px solid var(--terminal-green);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Press Start 2P", cursive;
+                font-size: 18px;
+                cursor: pointer;
+                transition: all 0.2s;
+                user-select: none;
+            }
+
+            .anagram-tile:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 20px rgba(0, 255, 65, 0.4);
+            }
+
+            .anagram-tile.selected {
+                background: var(--terminal-green);
+                color: var(--bg-dark);
+                transform: scale(1.1);
+            }
+
+            .anagram-tile.locked {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+            .answer-slots {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+                margin: 20px 0;
+                min-height: 65px;
+            }
+
+            .answer-slot {
+                width: 40px;
+                height: 50px;
+                border: 2px dashed var(--terminal-green-dim);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Press Start 2P", cursive;
+                font-size: 16px;
+            }
+
+            .answer-slot.filled {
+                border-style: solid;
+                border-color: var(--terminal-cyan);
+                background: rgba(0, 255, 255, 0.1);
+            }
+
+            .answer-slot.space {
+                width: 20px;
+                border: none;
+            }
+
+            .ttt-cell {
+                width: 80px;
+                height: 80px;
+                background: rgba(0, 255, 65, 0.1);
+                border: 2px solid var(--terminal-green);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'VT323', monospace;
+                font-size: 48px;
+                color: var(--terminal-green);
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .ttt-cell:hover:not(.taken) {
+                background: rgba(0, 255, 65, 0.3);
+            }
+            .ttt-cell.taken {
+                cursor: not-allowed;
+            }
+            .ttt-cell.x {
+                color: var(--terminal-cyan);
+            }
+            .ttt-cell.o {
+                color: var(--terminal-magenta);
+            }
+
+            .final-reveal {
+                text-align: center;
+                padding: 40px;
+            }
+
+            .access-granted {
+                font-family: "Press Start 2P", cursive;
+                font-size: 32px;
+                color: var(--terminal-green);
+                text-shadow: 0 0 30px var(--terminal-green);
+                animation: glitch 0.5s infinite;
+                margin-bottom: 30px;
+            }
+
+            .video-container {
+                position: relative;
+                width: 100%;
+                max-width: 640px;
+                margin: 0 auto;
+                border: 4px solid var(--terminal-green);
+                box-shadow: 0 0 40px var(--terminal-green);
+            }
+
+            .video-container iframe {
+                width: 100%;
+                aspect-ratio: 16/9;
+                display: block;
+            }
+
+            .pixel-decoration {
+                position: absolute;
+                font-size: 20px;
+                opacity: 0.3;
+            }
+
+            .loading-bar {
+                width: 100%;
+                height: 30px;
+                border: 2px solid var(--terminal-green);
+                margin: 20px 0;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .loading-fill {
+                height: 100%;
+                background: var(--terminal-green);
+                width: 0%;
+                transition: width 0.5s;
+                box-shadow: 0 0 20px var(--terminal-green);
+            }
+
+            .loading-text {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: var(--bg-dark);
+                font-weight: bold;
+                mix-blend-mode: difference;
+            }
+
+            .status-line {
+                font-size: 14px;
+                color: var(--terminal-green-dim);
+                margin: 5px 0;
+            }
+
+            .status-line::before {
+                content: "> ";
+                color: var(--terminal-cyan);
+            }
+
+            .hint-btn {
+                font-size: 10px;
+                padding: 8px 15px;
+                margin-top: 20px;
+                border-color: var(--terminal-amber);
+                color: var(--terminal-amber);
+            }
+
+            .hint-btn:hover {
+                background: var(--terminal-amber);
+                color: var(--bg-dark);
+            }
+
+            .intro-text {
+                font-size: 20px;
+                line-height: 1.8;
+                margin: 20px 0;
+            }
+
+            .intro-text .highlight {
+                color: var(--terminal-cyan);
+            }
+
+            .warning {
+                color: var(--terminal-red);
+                animation: blink 1s infinite;
+            }
+
+            .file-list {
+                font-size: 16px;
+                margin: 20px 0;
+                padding: 15px;
+                background: rgba(0, 0, 0, 0.3);
+                border: 1px solid var(--terminal-green-dim);
+            }
+
+            .file-item {
+                padding: 5px 0;
+            }
+
+            .file-item::before {
+                content: "├── ";
+                color: var(--terminal-green-dim);
+            }
+
+            .file-item:last-child::before {
+                content: "└── ";
+            }
+
+            .file-item .classified {
+                color: var(--terminal-red);
+            }
+
+            .file-item .size {
+                color: var(--terminal-green-dim);
+                float: right;
+            }
+
+            @media (max-width: 600px) {
+                .terminal-body {
+                    padding: 15px;
+                }
+                h1 {
+                    font-size: 12px;
+                }
+                h2 {
+                    font-size: 10px;
+                }
+                .btn {
+                    font-size: 10px;
+                    padding: 12px 20px;
+                }
+                .pattern-grid {
+                    max-width: 240px;
+                }
+                .wire-node {
+                    width: 45px;
+                    height: 45px;
+                    font-size: 12px;
+                }
+                .anagram-tile {
+                    width: 35px;
+                    height: 45px;
+                    font-size: 14px;
+                }
+                .answer-slot {
+                    width: 30px;
+                    height: 40px;
+                    font-size: 12px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="crt-overlay"></div>
+        <div class="matrix-bg" id="matrixBg"></div>
+
+        <!-- Sound prompt -->
+        <div
+            id="soundPrompt"
+            style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+            "
+        >
+            <button class="btn" onclick="beginExperience()">
+                [ TURN YOUR SOUND ON ]
+            </button>
+        </div>
+
+        <!-- Stage 0: Matrix Intro (outside terminal) -->
+        <div class="stage" id="stage0" style="display: none">
+            <audio id="knockAudio" src="knock-knock.mp3" preload="auto"></audio>
+            <div
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    padding: 40px;
+                "
+            >
+                <div style="text-align: left; max-width: 600px">
+                    <div
+                        id="matrixLine1"
+                        class="matrix-line"
+                        style="font-size: 32px; margin-bottom: 30px"
+                    ></div>
+                    <div
+                        id="knockKnock"
+                        style="
+                            display: none;
+                            text-align: center;
+                            margin-top: 50px;
+                        "
+                    >
+                        <button class="btn" onclick="startGame()">
+                            [ KNOCK KNOCK ]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 3: Sneakers Anagram (outside terminal) -->
+        <div
+            class="stage"
+            id="stage3"
+            style="
+                display: none;
+                background:
+                    linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
+                    url(&quot;playtronics-the-future-of-toys.jpg&quot;);
+                background-size: cover;
+                background-position: center;
+                min-height: 100vh;
+            "
+        >
+            <audio
+                id="passportAudio"
+                src="my-voice-is-my-passport.mp3"
+                preload="auto"
+            ></audio>
+            <div
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    padding: 40px;
+                "
+            >
+                <div style="max-width: 700px; width: 100%">
+                    <div
+                        class="puzzle-container"
+                        style="
+                            background: rgba(10, 10, 10, 0.9);
+                            border: 2px solid var(--terminal-green);
+                            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+                        "
+                    >
+                        <p class="status-line" style="text-align: center">
+                            INTERCEPTED TRANSMISSION FROM PLAYTRONICS...
+                        </p>
+
+                        <div style="text-align: center; margin: 30px 0">
+                            <p
+                                style="
+                                    color: var(--terminal-green-dim);
+                                    margin-bottom: 15px;
+                                "
+                            >
+                                CODE NAME:
+                            </p>
+                            <div
+                                id="setecSource"
+                                class="scrabble-rack"
+                                style="
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    justify-content: center;
+                                    gap: 8px;
+                                    margin-bottom: 30px;
+                                    min-height: 60px;
+                                "
+                            ></div>
+
+                            <p
+                                style="
+                                    color: var(--terminal-green-dim);
+                                    margin: 20px 0 15px;
+                                "
+                            >
+                                DECODED MESSAGE:
+                            </p>
+                            <div
+                                id="setecTarget"
+                                class="scrabble-rack"
+                                style="
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    justify-content: center;
+                                    gap: 8px;
+                                    min-height: 60px;
+                                "
+                            ></div>
+                        </div>
+
+                        <div
+                            id="setec-message"
+                            style="margin: 20px 0; text-align: center"
+                        ></div>
+
+                        <div style="text-align: center">
+                            <button class="btn" onclick="checkSetec()">
+                                [ VERIFY ]
+                            </button>
+                            <button class="btn hint-btn" onclick="resetSetec()">
+                                [ RESET ]
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 4: Chrome Dino Game (The Net Easter Egg) - outside terminal -->
+        <div
+            class="stage"
+            id="stage4"
+            style="
+                display: none;
+                background: #fff;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 500;
+            "
+        >
+            <!-- Audio resources for the game -->
+            <template id="audio-resources">
+                <audio
+                    id="offline-sound-press"
+                    src="data:audio/mpeg;base64,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"
+                ></audio>
+                <audio
+                    id="offline-sound-hit"
+                    src="data:audio/mpeg;base64,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"
+                ></audio>
+                <audio
+                    id="offline-sound-reached"
+                    src="data:audio/mpeg;base64,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"
+                ></audio>
+            </template>
+            <!-- Sprite sheets for the game -->
+            <img
+                id="offline-resources-1x"
+                src="offline-sprite-1x.png"
+                style="display: none"
+            />
+            <img
+                id="offline-resources-2x"
+                src="offline-sprite-2x.png"
+                style="display: none"
+            />
+
+            <!-- Dummy elements the game.js expects -->
+            <div id="shareBlock" style="display: none"></div>
+            <div id="currentScore" style="display: none"></div>
+
+            <!-- Chrome "No Internet" page layout -->
+            <div
+                style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding-top: 80px;
+                    font-family: &quot;Segoe UI&quot;, Arial, sans-serif;
+                "
+            >
+                <!-- Game canvas wrapper - dino appears here -->
+                <div class="interstitial-wrapper" style="width: 600px">
+                    <!-- The game canvas will be injected here by Runner -->
+                </div>
+
+                <!-- No internet text below the game -->
+                <div
+                    id="noInternetText"
+                    style="text-align: left; max-width: 400px; margin-top: 20px"
+                >
+                    <div
+                        style="
+                            font-size: 24px;
+                            color: #202124;
+                            margin-bottom: 16px;
+                            font-weight: 400;
+                        "
+                    >
+                        No internet
+                    </div>
+                    <div
+                        style="
+                            font-size: 14px;
+                            color: #5f6368;
+                            margin-bottom: 8px;
+                        "
+                    >
+                        Try:
+                    </div>
+                    <ul
+                        style="
+                            font-size: 14px;
+                            color: #5f6368;
+                            margin: 0;
+                            padding-left: 20px;
+                            line-height: 1.8;
+                        "
+                    >
+                        <li>Checking the network cables, modem, and router</li>
+                        <li>Reconnecting to Wi-Fi</li>
+                        <li>
+                            <a
+                                href="#"
+                                onclick="return false;"
+                                style="color: #1a73e8; text-decoration: none"
+                                >Running Windows Network Diagnostics</a
+                            >
+                        </li>
+                    </ul>
+                    <div
+                        style="
+                            font-size: 12px;
+                            color: #9aa0a6;
+                            margin-top: 24px;
+                        "
+                    >
+                        DNS_PROBE_FINISHED_NO_INTERNET
+                    </div>
+                </div>
+            </div>
+
+            <!-- Troll message display -->
+            <div
+                id="dino-message"
+                style="
+                    position: fixed;
+                    bottom: 60px;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    font-family: &quot;Segoe UI&quot;, Arial, sans-serif;
+                    font-size: 14px;
+                    color: #5f6368;
+                "
+            ></div>
+
+            <!-- The hidden π symbol - barely visible on white -->
+            <div
+                id="piSymbol"
+                style="
+                    position: fixed;
+                    bottom: 15px;
+                    right: 15px;
+                    font-size: 20px;
+                    color: rgba(0, 0, 0, 0.04);
+                    cursor: default;
+                    user-select: none;
+                    font-family: Georgia, serif;
+                    z-index: 600;
+                "
+                title=""
+            >
+                π
+            </div>
+        </div>
+
+        <div class="container" id="terminalContainer" style="display: none">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <div class="terminal-btn red"></div>
+                        <div class="terminal-btn yellow"></div>
+                        <div class="terminal-btn green"></div>
+                    </div>
+                    <div class="terminal-title">Terminal</div>
+                </div>
+
+                <div class="terminal-body">
+                    <!-- Progress Bar -->
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-node current" data-stage="1">
+                            1
+                        </div>
+                        <div class="progress-connector"></div>
+                        <div class="progress-node" data-stage="2">2</div>
+                        <div class="progress-connector"></div>
+                        <div class="progress-node" data-stage="3">3</div>
+                        <div class="progress-connector"></div>
+                        <div class="progress-node" data-stage="4">4</div>
+                        <div class="progress-connector"></div>
+                        <div class="progress-node" data-stage="5">5</div>
+                        <div class="progress-connector"></div>
+                        <div class="progress-node" data-stage="6">★</div>
+                    </div>
+
+                    <!-- Stage 1: WOPR Backdoor -->
+                    <div class="stage" id="stage1">
+                        <audio
+                            id="loginAudio"
+                            src="login_noise_wopr.mp3"
+                            preload="auto"
+                        ></audio>
+                        <audio
+                            id="falkenAudio"
+                            src="greetings-professor-falken.mp3"
+                            preload="auto"
+                        ></audio>
+
+                        <div
+                            class="puzzle-container"
+                            style="text-align: center; padding: 60px 30px"
+                        >
+                            <div
+                                id="greetingText"
+                                class="binary-display"
+                                style="
+                                    font-size: 28px;
+                                    margin-bottom: 40px;
+                                    display: none;
+                                "
+                            >
+                                GREETINGS, PROFESSOR FALKEN.
+                            </div>
+
+                            <div
+                                id="loginPrompt"
+                                class="prompt"
+                                style="
+                                    justify-content: center;
+                                    margin-top: 40px;
+                                    opacity: 0;
+                                    transition: opacity 0.5s;
+                                "
+                            >
+                                <span
+                                    style="
+                                        font-size: 28px;
+                                        color: var(--terminal-green);
+                                    "
+                                    >LOGIN:</span
+                                >
+                                <input
+                                    type="text"
+                                    id="binaryInput"
+                                    style="font-size: 28px; max-width: 300px"
+                                    maxlength="20"
+                                    autocomplete="off"
+                                />
+                            </div>
+
+                            <div
+                                id="binary-message"
+                                style="margin-top: 30px; font-size: 24px"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Stage 2: Hack The Gibson Terminal -->
+                    <div class="stage" id="stage2">
+                        <h2 style="text-align: center; margin-bottom: 20px">
+                            // "MESS WITH THE BEST, DIE LIKE THE REST"
+                        </h2>
+
+                        <div class="puzzle-container" style="padding: 0">
+                            <div
+                                id="gibsonTerminal"
+                                onclick="document.getElementById('terminalInput').focus()"
+                                style="
+                                    background: #0a0a0a;
+                                    border: 2px solid var(--terminal-green);
+                                    font-family: &quot;VT323&quot;, monospace;
+                                    height: 400px;
+                                    overflow-y: auto;
+                                    padding: 15px;
+                                    cursor: text;
+                                "
+                            >
+                                <div id="terminalOutput"></div>
+                                <div
+                                    id="terminalPrompt"
+                                    style="display: flex; align-items: center"
+                                >
+                                    <span style="color: var(--terminal-cyan)"
+                                        >root@localhost:~#
+                                    </span>
+                                    <input
+                                        type="text"
+                                        id="terminalInput"
+                                        style="
+                                            flex: 1;
+                                            background: transparent;
+                                            border: none;
+                                            color: var(--terminal-green);
+                                            font-family:
+                                                &quot;VT323&quot;, monospace;
+                                            font-size: 20px;
+                                            outline: none;
+                                            padding: 0;
+                                            margin-left: 5px;
+                                            text-transform: none;
+                                        "
+                                        autocomplete="off"
+                                        autocapitalize="off"
+                                        spellcheck="false"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stage 5: WarGames Tic-Tac-Toe -->
+                    <div class="stage" id="stage5">
+                        <div class="puzzle-container" style="text-align: center;">
+                            <pre class="ascii-art" style="color: var(--terminal-green); font-size: 14px; margin-bottom: 20px;">
+██╗    ██╗ ██████╗ ██████╗ ██████╗
+██║    ██║██╔═══██╗██╔══██╗██╔══██╗
+██║ █╗ ██║██║   ██║██████╔╝██████╔╝
+██║███╗██║██║   ██║██╔═══╝ ██╔══██╗
+╚███╔███╔╝╚██████╔╝██║     ██║  ██║
+ ╚══╝╚══╝  ╚═════╝ ╚═╝     ╚═╝  ╚═╝
+                            </pre>
+
+                            <div id="wopr-terminal" style="font-family: 'VT323', monospace; font-size: 24px; color: var(--terminal-green);">
+                                <p id="wopr-message" style="margin-bottom: 20px;"></p>
+
+                                <div id="wopr-prompt" style="display: none; margin-bottom: 20px;">
+                                    <p>PLEASE CHOOSE NUMBER OF PLAYERS:</p>
+                                    <p style="margin-top: 10px;">1 - ONE PLAYER</p>
+                                    <p>2 - TWO PLAYERS</p>
+                                    <p>0 - ZERO PLAYERS</p>
+                                    <div style="margin-top: 20px;">
+                                        <span style="color: var(--terminal-cyan);">>&nbsp;</span>
+                                        <input type="text" id="wopr-input" maxlength="1"
+                                            style="background: transparent; border: none; border-bottom: 2px solid var(--terminal-green);
+                                            color: var(--terminal-green); font-family: 'VT323', monospace; font-size: 24px;
+                                            width: 40px; text-align: center; outline: none;"
+                                            onkeypress="handleWoprInput(event)">
+                                    </div>
+                                </div>
+
+                                <div id="ttt-board" style="display: none; margin: 30px auto;">
+                                    <div style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px; justify-content: center;">
+                                        <div class="ttt-cell" data-cell="0"></div>
+                                        <div class="ttt-cell" data-cell="1"></div>
+                                        <div class="ttt-cell" data-cell="2"></div>
+                                        <div class="ttt-cell" data-cell="3"></div>
+                                        <div class="ttt-cell" data-cell="4"></div>
+                                        <div class="ttt-cell" data-cell="5"></div>
+                                        <div class="ttt-cell" data-cell="6"></div>
+                                        <div class="ttt-cell" data-cell="7"></div>
+                                        <div class="ttt-cell" data-cell="8"></div>
+                                    </div>
+                                    <p id="ttt-status" style="margin-top: 20px; color: var(--terminal-cyan);"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <audio id="shall-we-play" src="shall-we-play-a-game.mp3" preload="auto"></audio>
+                        <audio id="strange-game" src="strange-game-how-about.mp3" preload="auto"></audio>
+                    </div>
+
+                    <!-- Stage 6: Victory -->
+                    <div class="stage" id="stage6">
+                        <div class="final-reveal">
+                            <pre
+                                class="ascii-art"
+                                style="color: var(--terminal-green)"
+                            >
+███████╗ █████╗ ███████╗████████╗███████╗██████╗     ███████╗ ██████╗  ██████╗
+██╔════╝██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗    ██╔════╝██╔════╝ ██╔════╝
+█████╗  ███████║███████╗   ██║   █████╗  ██████╔╝    █████╗  ██║  ███╗██║  ███╗
+██╔══╝  ██╔══██║╚════██║   ██║   ██╔══╝  ██╔══██╗    ██╔══╝  ██║   ██║██║   ██║
+███████╗██║  ██║███████║   ██║   ███████╗██║  ██║    ███████╗╚██████╔╝╚██████╔╝
+╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝  ╚═════╝
+                      ███████╗ ██████╗ ██╗   ██╗███╗   ██╗██████╗
+                      ██╔════╝██╔═══██╗██║   ██║████╗  ██║██╔══██╗
+                      █████╗  ██║   ██║██║   ██║██╔██╗ ██║██║  ██║
+                      ██╔══╝  ██║   ██║██║   ██║██║╚██╗██║██║  ██║
+                      ██║     ╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝
+                      ╚═╝      ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝
+                        </pre
+                            >
+
+                            <div class="loading-bar" id="loadingBar">
+                                <div
+                                    class="loading-fill"
+                                    id="loadingFill"
+                                ></div>
+                                <span class="loading-text" id="loadingText"
+                                    >DECRYPTING...</span
+                                >
+                            </div>
+
+                            <div id="finalContent" style="display: none">
+                                <div class="access-granted">
+                                    ★ YOU FOUND THE EASTER EGG ★
+                                </div>
+
+                                <p class="status-line">
+                                    CONGRATULATIONS, GUNTER.
+                                </p>
+                                <p class="status-line">
+                                    HALLIDAY'S FINAL MESSAGE UNLOCKED...
+                                </p>
+                                <p
+                                    class="status-line"
+                                    style="color: var(--terminal-cyan)"
+                                >
+                                    "I created the OASIS because I never felt at
+                                    home in the real world."
+                                </p>
+                                <p
+                                    class="status-line"
+                                    style="color: var(--terminal-magenta)"
+                                >
+                                    But sometimes, the real treasure is the
+                                    journey itself...
+                                </p>
+
+                                <div
+                                    class="video-container"
+                                    style="margin-top: 30px"
+                                >
+                                    <iframe
+                                        id="rickVideo"
+                                        src=""
+                                        title="HALLIDAY'S EASTER EGG"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                    >
+                                    </iframe>
+                                </div>
+
+                                <p
+                                    style="
+                                        margin-top: 30px;
+                                        color: var(--terminal-amber);
+                                        font-family:
+                                            &quot;Press Start 2P&quot;, cursive;
+                                        font-size: 10px;
+                                    "
+                                >
+                                    THE ULTIMATE 80s ARTIFACT. YOU'VE BEEN
+                                    RICKROLLED.
+                                </p>
+                                <p
+                                    style="
+                                        margin-top: 10px;
+                                        color: var(--terminal-green-dim);
+                                        font-size: 14px;
+                                    "
+                                >
+                                    "Thanks for playing." — Halliday
+                                </p>
+
+                                <button
+                                    class="btn"
+                                    style="margin-top: 20px"
+                                    onclick="location.reload()"
+                                >
+                                    [ PLAY AGAIN ]
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let currentStage = 0;
+
+            // Typewriter effect for Matrix intro
+            function typeWriter(element, text, speed, callback) {
+                let i = 0;
+                element.textContent = "";
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    } else if (callback) {
+                        callback();
+                    }
+                }
+                type();
+            }
+
+            function playMatrixIntro() {
+                const line1 = document.getElementById("matrixLine1");
+                const knockBtn = document.getElementById("knockKnock");
+                const knockAudio = document.getElementById("knockAudio");
+
+                // Message 1: Wake up, Neo... (starts immediately)
+                typeWriter(line1, "Wake up, Neo...", 120, () => {
+                    // Pause, then erase
+                    setTimeout(() => {
+                        line1.style.transition = "opacity 0.5s";
+                        line1.style.opacity = "0";
+
+                        setTimeout(() => {
+                            line1.textContent = "";
+                            line1.style.opacity = "1";
+
+                            // Message 2: The Matrix has you...
+                            setTimeout(() => {
+                                typeWriter(
+                                    line1,
+                                    "The Matrix has you...",
+                                    120,
+                                    () => {
+                                        // Pause, then erase
+                                        setTimeout(() => {
+                                            line1.style.opacity = "0";
+
+                                            setTimeout(() => {
+                                                line1.textContent = "";
+                                                line1.style.opacity = "1";
+
+                                                // Message 3: Follow the white rabbit.
+                                                setTimeout(() => {
+                                                    typeWriter(
+                                                        line1,
+                                                        "Follow the white rabbit.",
+                                                        120,
+                                                        () => {
+                                                            // Pause, play knock sound, then show button
+                                                            setTimeout(() => {
+                                                                knockAudio.play();
+                                                                knockAudio.addEventListener(
+                                                                    "ended",
+                                                                    () => {
+                                                                        knockBtn.style.display =
+                                                                            "block";
+                                                                    },
+                                                                );
+                                                            }, 2000);
+                                                        },
+                                                    );
+                                                }, 500);
+                                            }, 500);
+                                        }, 2500);
+                                    },
+                                );
+                            }, 500);
+                        }, 500);
+                    }, 2500);
+                });
+            }
+
+            function beginExperience() {
+                // Hide sound prompt
+                document.getElementById("soundPrompt").style.display = "none";
+                // Show Matrix intro
+                document.getElementById("stage0").style.display = "block";
+                // Start the typing
+                playMatrixIntro();
+            }
+
+            // Debug: Check for skip to stage
+            // Usage: localStorage.setItem('skipToStage', '3') then refresh
+            document.addEventListener("DOMContentLoaded", () => {
+                const skipTo = localStorage.getItem("skipToStage");
+                if (skipTo) {
+                    const stage = parseInt(skipTo);
+                    if (stage >= 1 && stage <= 6) {
+                        document.getElementById("soundPrompt").style.display =
+                            "none";
+                        document.getElementById("stage0").style.display =
+                            "none";
+                        // goToStage will handle terminal container visibility
+                        goToStage(stage);
+                        console.log("Skipped to stage " + stage);
+                    }
+                }
+            });
+
+            // Matrix rain background
+            function createMatrixRain() {
+                const bg = document.getElementById("matrixBg");
+                const chars =
+                    "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF";
+
+                for (let i = 0; i < 30; i++) {
+                    const column = document.createElement("div");
+                    column.className = "matrix-column";
+                    column.style.left = i * 3.5 + "%";
+                    column.style.animationDuration =
+                        3 + Math.random() * 5 + "s";
+                    column.style.animationDelay = Math.random() * 5 + "s";
+
+                    let text = "";
+                    for (let j = 0; j < 50; j++) {
+                        text +=
+                            chars[Math.floor(Math.random() * chars.length)] +
+                            " ";
+                    }
+                    column.textContent = text;
+                    bg.appendChild(column);
+                }
+            }
+            createMatrixRain();
+
+            function updateProgress(stage) {
+                const nodes = document.querySelectorAll(".progress-node");
+                const connectors = document.querySelectorAll(
+                    ".progress-connector",
+                );
+
+                nodes.forEach((node, i) => {
+                    node.classList.remove("current", "completed");
+                    if (i < stage - 1) {
+                        node.classList.add("completed");
+                    } else if (i === stage - 1) {
+                        node.classList.add("current");
+                    }
+                });
+
+                connectors.forEach((conn, i) => {
+                    conn.classList.remove("completed");
+                    if (i < stage - 1) {
+                        conn.classList.add("completed");
+                    }
+                });
+            }
+
+            function goToStage(stage) {
+                document
+                    .querySelectorAll(".stage")
+                    .forEach((s) => s.classList.remove("active"));
+                document
+                    .getElementById("stage" + stage)
+                    .classList.add("active");
+                currentStage = stage;
+                updateProgress(stage);
+
+                // Handle terminal container visibility
+                // Stage 3 is outside terminal container (like stage 0)
+                // Stage 4 is full-screen 404/dino page
+                if (stage === 3) {
+                    document.getElementById("terminalContainer").style.display =
+                        "none";
+                    document.getElementById("stage3").style.display = "block";
+                    document.getElementById("stage4").style.display = "none";
+                } else if (stage === 4) {
+                    document.getElementById("terminalContainer").style.display =
+                        "none";
+                    document.getElementById("stage3").style.display = "none";
+                    document.getElementById("stage4").style.display = "block";
+                } else {
+                    document.getElementById("stage3").style.display = "none";
+                    document.getElementById("stage4").style.display = "none";
+                    document.getElementById("terminalContainer").style.display =
+                        "block";
+                }
+
+                // Hide π symbol unless on stage 4
+                const piSymbol = document.getElementById("piSymbol");
+                if (piSymbol) {
+                    piSymbol.style.display = stage === 4 ? "block" : "none";
+                }
+
+                if (stage === 1) {
+                    initStage1();
+                }
+                if (stage === 2) {
+                    initGibsonTerminal();
+                }
+                if (stage === 3) {
+                    initSetec();
+                }
+                if (stage === 4) {
+                    initDinoGame();
+                }
+                if (stage === 5) {
+                    initWarGames();
+                }
+                if (stage === 6) {
+                    playFinalSequence();
+                }
+            }
+
+            function initStage1() {
+                const loginAudio = document.getElementById("loginAudio");
+                const loginPrompt = document.getElementById("loginPrompt");
+                const input = document.getElementById("binaryInput");
+
+                // Play login noise
+                loginAudio
+                    .play()
+                    .catch((e) => console.log("Audio autoplay blocked:", e));
+
+                // Fade in the login prompt
+                setTimeout(() => {
+                    loginPrompt.style.opacity = "1";
+                    input.focus();
+                }, 500);
+            }
+
+            function startGame() {
+                // Hide the Matrix intro
+                document.getElementById("stage0").style.display = "none";
+                // Show the terminal
+                document.getElementById("terminalContainer").style.display =
+                    "block";
+                // Go to stage 1
+                goToStage(1);
+            }
+
+            // Stage 1: WOPR Password (WarGames)
+            function checkBinary() {
+                const input = document
+                    .getElementById("binaryInput")
+                    .value.toUpperCase();
+                const msgDiv = document.getElementById("binary-message");
+
+                if (input === "JOSHUA") {
+                    const falkenAudio = document.getElementById("falkenAudio");
+                    const greetingText =
+                        document.getElementById("greetingText");
+                    const loginPrompt = document.getElementById("loginPrompt");
+
+                    // Hide login prompt
+                    loginPrompt.style.opacity = "0";
+                    setTimeout(() => {
+                        loginPrompt.style.display = "none";
+                    }, 500);
+
+                    // Play greetings audio and show text
+                    falkenAudio
+                        .play()
+                        .catch((e) => console.log("Audio blocked:", e));
+                    greetingText.style.display = "block";
+                    greetingText.style.opacity = "0";
+                    setTimeout(() => {
+                        greetingText.style.transition = "opacity 1s";
+                        greetingText.style.opacity = "1";
+                    }, 600);
+
+                    // Proceed to next stage
+                    setTimeout(() => goToStage(2), 3500);
+                } else if (input.length > 0) {
+                    msgDiv.className = "message error";
+                    msgDiv.style.border = "none";
+                    msgDiv.style.background = "none";
+                    msgDiv.textContent = "ACCESS DENIED";
+                    document.getElementById("binaryInput").value = "";
+                }
+            }
+
+            // Stage 2: Hack The Gibson Terminal
+            const GIBSON_IP = "10.23.19.95";
+            const GIBSON_HOST = "gibson.ellingson.com";
+            const OPEN_PORT = 1337;
+            let terminalHistory = [];
+            let historyIndex = -1;
+            let commandRunning = false;
+
+            function initGibsonTerminal() {
+                const output = document.getElementById("terminalOutput");
+                const input = document.getElementById("terminalInput");
+
+                output.innerHTML = "";
+                terminalHistory = ["ping gibson.ellingson.com", "man nmap"];
+                historyIndex = terminalHistory.length;
+
+                printLine(
+                    "   ▄████▄   ██▀███   ▄▄▄        ██████  ██░ ██ ",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "  ▒██▀ ▀█  ▓██ ▒ ██▒▒████▄    ▒██    ▒ ▓██░ ██▒",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "  ▒▓█    ▄ ▓██ ░▄█ ▒▒██  ▀█▄  ░ ▓██▄   ▒██▀▀██░",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "  ▒▓▓▄ ▄██▒▒██▀▀█▄  ░██▄▄▄▄██   ▒   ██▒░▓█ ░██ ",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "  ▒ ▓███▀ ░░██▓ ▒██▒ ▓█   ▓██▒▒██████▒▒░▓█▒░██▓",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "  ░ ░▒ ▒  ░░ ▒▓ ░▒▓░ ▒▒   ▓▒█░▒ ▒▓▒ ▒ ░ ▒ ░░▒░▒",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "         ░░░ ░▒ ░ ▒░  ▒   ▒▒ ░░ ░▒  ░ ░ ▒ ░▒░ ░",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "  ░ ░      ░░   ░   ░   ▒   ░  ░  ░   ░  ░░ ░",
+                    "var(--terminal-cyan)",
+                );
+                printLine(
+                    "             ░           ░  ░      ░   ░  ░  ░",
+                    "var(--terminal-cyan)",
+                );
+                printLine("               OVERRIDE", "var(--terminal-cyan)");
+                printLine("");
+                printLine(
+                    "═══════════════════════════════════════════════════════",
+                    "var(--terminal-green-dim)",
+                );
+                printLine("");
+                printLine("  Yo Zero Cool,", "var(--terminal-green)");
+                printLine("");
+                printLine(
+                    "  I got us root on this box. The Gibson is within reach.",
+                    "var(--terminal-green)",
+                );
+                printLine(
+                    "  Check the history - I left you some breadcrumbs.",
+                    "var(--terminal-amber)",
+                );
+                printLine("");
+                printLine("  Hack the planet.", "var(--terminal-green)");
+                printLine("  - Crash Override", "var(--terminal-cyan)");
+                printLine("");
+                printLine(
+                    "═══════════════════════════════════════════════════════",
+                    "var(--terminal-green-dim)",
+                );
+                printLine("");
+
+                input.focus();
+
+                input.addEventListener("keydown", function (e) {
+                    if (commandRunning) {
+                        e.preventDefault();
+                        return;
+                    }
+                    if (e.key === "Enter") {
+                        const cmd = input.value.trim();
+                        if (cmd) {
+                            terminalHistory.push(cmd);
+                            historyIndex = terminalHistory.length;
+                            processCommand(cmd);
+                        }
+                        input.value = "";
+                    } else if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        if (historyIndex > 0) {
+                            historyIndex--;
+                            input.value = terminalHistory[historyIndex];
+                        }
+                    } else if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        if (historyIndex < terminalHistory.length - 1) {
+                            historyIndex++;
+                            input.value = terminalHistory[historyIndex];
+                        } else {
+                            historyIndex = terminalHistory.length;
+                            input.value = "";
+                        }
+                    }
+                });
+            }
+
+            function hidePrompt() {
+                document.getElementById("terminalPrompt").style.display =
+                    "none";
+            }
+
+            function showPrompt() {
+                document.getElementById("terminalPrompt").style.display =
+                    "flex";
+                document.getElementById("terminalInput").focus();
+            }
+
+            function printLine(text, color = "var(--terminal-green)") {
+                const output = document.getElementById("terminalOutput");
+                const line = document.createElement("div");
+                line.style.color = color;
+                line.style.fontSize = "18px";
+                line.style.marginBottom = "2px";
+                line.style.whiteSpace = "pre-wrap";
+                line.textContent = text;
+                output.appendChild(line);
+                document.getElementById("gibsonTerminal").scrollTop =
+                    document.getElementById("gibsonTerminal").scrollHeight;
+            }
+
+            function printCommand(cmd) {
+                printLine("root@localhost:~# " + cmd, "var(--terminal-cyan)");
+            }
+
+            function processCommand(cmd) {
+                printCommand(cmd);
+                const parts = cmd.toLowerCase().split(/\s+/);
+                const command = parts[0];
+                const args = parts.slice(1);
+
+                switch (command) {
+                    case "help":
+                        printLine("");
+                        printLine(
+                            "Available commands:",
+                            "var(--terminal-amber)",
+                        );
+                        printLine("  help              Show this help message");
+                        printLine(
+                            "  man <command>     Show manual for a command",
+                        );
+                        printLine(
+                            "  nmap <host>       Scan target for open ports",
+                        );
+                        printLine(
+                            "  telnet <host> <port>  Connect to remote host",
+                        );
+                        printLine("  whoami            Display current user");
+                        printLine("  clear             Clear the terminal");
+                        printLine("");
+                        break;
+
+                    case "man":
+                        if (args.length === 0) {
+                            printLine(
+                                "What manual page do you want?",
+                                "var(--terminal-amber)",
+                            );
+                        } else {
+                            showManPage(args[0]);
+                        }
+                        break;
+
+                    case "nmap":
+                        if (args.length === 0) {
+                            printLine(
+                                "Usage: nmap <hostname or ip>",
+                                "var(--terminal-red)",
+                            );
+                            printLine(
+                                "Try: nmap " + GIBSON_HOST,
+                                "var(--terminal-green-dim)",
+                            );
+                        } else if (
+                            args[0] === GIBSON_HOST ||
+                            args[0] === GIBSON_IP
+                        ) {
+                            runNmapScan();
+                        } else {
+                            printLine(
+                                "nmap: unable to resolve host: " + args[0],
+                                "var(--terminal-red)",
+                            );
+                        }
+                        break;
+
+                    case "telnet":
+                        if (args.length < 2) {
+                            printLine(
+                                "Usage: telnet <host> <port>",
+                                "var(--terminal-red)",
+                            );
+                        } else if (
+                            args[0] === GIBSON_HOST ||
+                            args[0] === GIBSON_IP
+                        ) {
+                            const port = parseInt(args[1]);
+                            attemptTelnet(port);
+                        } else {
+                            printLine(
+                                "telnet: could not resolve " +
+                                    args[0] +
+                                    ": Name or service not known",
+                                "var(--terminal-red)",
+                            );
+                        }
+                        break;
+
+                    case "whoami":
+                        printLine("zero_cool");
+                        break;
+
+                    case "clear":
+                        document.getElementById("terminalOutput").innerHTML =
+                            "";
+                        break;
+
+                    case "history":
+                        printLine("");
+                        for (let i = 0; i < terminalHistory.length; i++) {
+                            printLine(
+                                "  " + (i + 1) + "  " + terminalHistory[i],
+                            );
+                        }
+                        printLine("");
+                        break;
+
+                    case "pwd":
+                        printLine("/home/zero_cool");
+                        break;
+
+                    case "ls":
+                        printLine(
+                            "hack_the_planet.sh  notes.txt  targets/",
+                            "var(--terminal-cyan)",
+                        );
+                        break;
+
+                    case "cat":
+                        if (args[0] === "notes.txt") {
+                            printLine(
+                                "Target: The Gibson @ Ellingson Mineral Company",
+                            );
+                            printLine(
+                                "They think they're elite. Let's prove them wrong.",
+                            );
+                            printLine(
+                                "Remember: scan first, then connect to the vulnerable port.",
+                            );
+                        } else {
+                            printLine(
+                                "cat: " +
+                                    (args[0] || "") +
+                                    ": No such file or directory",
+                                "var(--terminal-red)",
+                            );
+                        }
+                        break;
+
+                    case "god":
+                    case "love":
+                    case "secret":
+                    case "sex":
+                        printLine(
+                            "Ha! You think The Plague would use something that simple?",
+                            "var(--terminal-magenta)",
+                        );
+                        printLine(
+                            "This isn't a password prompt. Try scanning for ports.",
+                            "var(--terminal-green-dim)",
+                        );
+                        break;
+
+                    case "sudo":
+                        printLine(
+                            "zero_cool is not in the sudoers file. This incident will be reported.",
+                            "var(--terminal-red)",
+                        );
+                        break;
+
+                    case "hack":
+                        printLine(
+                            "Hack the planet!",
+                            "var(--terminal-magenta)",
+                        );
+                        printLine(
+                            "But seriously, try: nmap " + GIBSON_HOST,
+                            "var(--terminal-green-dim)",
+                        );
+                        break;
+
+                    case "ping":
+                        if (args[0] === GIBSON_HOST || args[0] === GIBSON_IP) {
+                            runPing();
+                        } else {
+                            printLine(
+                                "ping: " + (args[0] || "unknown host"),
+                                "var(--terminal-red)",
+                            );
+                        }
+                        break;
+
+                    case "exit":
+                    case "quit":
+                        printLine(
+                            "There is no escape. Hack the Gibson.",
+                            "var(--terminal-magenta)",
+                        );
+                        break;
+
+                    default:
+                        printLine(
+                            command + ": command not found",
+                            "var(--terminal-red)",
+                        );
+                        printLine(
+                            'Type "help" for available commands.',
+                            "var(--terminal-green-dim)",
+                        );
+                }
+                printLine("");
+            }
+
+            function showManPage(cmd) {
+                printLine("");
+                switch (cmd) {
+                    case "nmap":
+                        printLine(
+                            "NMAP(1)                    Network Mapper                    NMAP(1)",
+                            "var(--terminal-amber)",
+                        );
+                        printLine("");
+                        printLine("NAME");
+                        printLine(
+                            "       nmap - Network exploration tool and port scanner",
+                        );
+                        printLine("");
+                        printLine("SYNOPSIS");
+                        printLine("       nmap <hostname or ip>");
+                        printLine("");
+                        printLine("DESCRIPTION");
+                        printLine(
+                            "       Scans the target host for open TCP ports.",
+                        );
+                        printLine(
+                            "       Open ports may indicate vulnerable services.",
+                        );
+                        printLine("");
+                        printLine("EXAMPLE");
+                        printLine("       nmap 192.168.1.1");
+                        printLine("       nmap gibson.ellingson.com");
+                        break;
+
+                    case "telnet":
+                        printLine(
+                            "TELNET(1)                 Remote Login                     TELNET(1)",
+                            "var(--terminal-amber)",
+                        );
+                        printLine("");
+                        printLine("NAME");
+                        printLine("       telnet - connect to remote host");
+                        printLine("");
+                        printLine("SYNOPSIS");
+                        printLine("       telnet <host> <port>");
+                        printLine("");
+                        printLine("DESCRIPTION");
+                        printLine(
+                            "       Opens a connection to the specified host and port.",
+                        );
+                        printLine(
+                            "       Use nmap first to discover open ports.",
+                        );
+                        printLine("");
+                        printLine("EXAMPLE");
+                        printLine("       telnet gibson.ellingson.com 23");
+                        break;
+
+                    case "help":
+                        printLine(
+                            'Just type "help" to see available commands.',
+                            "var(--terminal-green-dim)",
+                        );
+                        break;
+
+                    default:
+                        printLine(
+                            "No manual entry for " + cmd,
+                            "var(--terminal-red)",
+                        );
+                }
+                printLine("");
+            }
+
+            function runPing() {
+                commandRunning = true;
+                hidePrompt();
+                printLine(
+                    "PING " +
+                        GIBSON_HOST +
+                        " (" +
+                        GIBSON_IP +
+                        "): 56 data bytes",
+                );
+
+                const packets = [
+                    "64 bytes from " +
+                        GIBSON_IP +
+                        ": icmp_seq=0 ttl=64 time=12.042 ms",
+                    "64 bytes from " +
+                        GIBSON_IP +
+                        ": icmp_seq=1 ttl=64 time=11.338 ms",
+                    "64 bytes from " +
+                        GIBSON_IP +
+                        ": icmp_seq=2 ttl=64 time=13.117 ms",
+                ];
+
+                let i = 0;
+                const pingInterval = setInterval(() => {
+                    printLine(packets[i]);
+                    i++;
+                    if (i >= packets.length) {
+                        clearInterval(pingInterval);
+                        setTimeout(() => {
+                            printLine("");
+                            printLine(
+                                "--- " + GIBSON_HOST + " ping statistics ---",
+                            );
+                            printLine(
+                                "3 packets transmitted, 3 received, 0% packet loss",
+                            );
+                            printLine("");
+                            commandRunning = false;
+                            showPrompt();
+                        }, 800);
+                    }
+                }, 1000);
+            }
+
+            function runNmapScan() {
+                commandRunning = true;
+                hidePrompt();
+                printLine("");
+                printLine(
+                    "Starting Nmap scan for " + GIBSON_HOST + "...",
+                    "var(--terminal-amber)",
+                );
+                printLine("");
+
+                let dots = 0;
+                const scanInterval = setInterval(() => {
+                    const output = document.getElementById("terminalOutput");
+                    const lastLine = output.lastChild;
+                    if (
+                        lastLine &&
+                        lastLine.textContent.startsWith("Scanning")
+                    ) {
+                        lastLine.textContent =
+                            "Scanning" + ".".repeat((dots % 3) + 1);
+                    } else {
+                        printLine("Scanning...", "var(--terminal-green-dim)");
+                    }
+                    dots++;
+                }, 300);
+
+                setTimeout(() => {
+                    clearInterval(scanInterval);
+                    const output = document.getElementById("terminalOutput");
+                    // Remove the "Scanning..." line
+                    if (output.lastChild) output.removeChild(output.lastChild);
+
+                    printLine(
+                        "Nmap scan report for " +
+                            GIBSON_HOST +
+                            " (" +
+                            GIBSON_IP +
+                            ")",
+                        "var(--terminal-green)",
+                    );
+                    printLine(
+                        "Host is up (0.0042s latency).",
+                        "var(--terminal-green)",
+                    );
+                    printLine("");
+                    printLine(
+                        "PORT      STATE    SERVICE",
+                        "var(--terminal-amber)",
+                    );
+                    printLine("21/tcp    filtered ftp");
+                    printLine("22/tcp    filtered ssh");
+                    printLine("23/tcp    filtered telnet");
+                    printLine("80/tcp    filtered http");
+                    printLine("443/tcp   filtered https");
+                    printLine(
+                        "1337/tcp  open     elite",
+                        "var(--terminal-cyan)",
+                    );
+                    printLine("");
+                    printLine(
+                        "Nmap done: 1 IP address (1 host up) scanned in 2.35 seconds",
+                    );
+                    printLine("");
+                    commandRunning = false;
+                    showPrompt();
+
+                    document.getElementById("gibsonTerminal").scrollTop =
+                        document.getElementById("gibsonTerminal").scrollHeight;
+                }, 2000);
+            }
+
+            function attemptTelnet(port) {
+                commandRunning = true;
+                hidePrompt();
+                printLine("Trying " + GIBSON_IP + "...");
+
+                setTimeout(() => {
+                    if (port === OPEN_PORT) {
+                        printLine(
+                            "Connected to " + GIBSON_HOST + ".",
+                            "var(--terminal-cyan)",
+                        );
+                        printLine(
+                            "Escape character is '^]'.",
+                            "var(--terminal-green-dim)",
+                        );
+                        printLine("");
+                        printLine(
+                            "=====================================",
+                            "var(--terminal-magenta)",
+                        );
+                        printLine(
+                            "  GIBSON SUPERCOMPUTER - WELCOME    ",
+                            "var(--terminal-magenta)",
+                        );
+                        printLine(
+                            '  "There is no right and wrong.     ',
+                            "var(--terminal-magenta)",
+                        );
+                        printLine(
+                            '   There is only fun and boring."   ',
+                            "var(--terminal-magenta)",
+                        );
+                        printLine(
+                            "=====================================",
+                            "var(--terminal-magenta)",
+                        );
+                        printLine("");
+                        printLine("ACCESS GRANTED", "var(--terminal-green)");
+                        printLine("");
+                        printLine("HACK THE PLANET!", "var(--terminal-amber)");
+
+                        setTimeout(() => goToStage(3), 2500);
+                    } else if (
+                        port === 21 ||
+                        port === 22 ||
+                        port === 23 ||
+                        port === 80 ||
+                        port === 443
+                    ) {
+                        printLine(
+                            "telnet: connect to address " +
+                                GIBSON_IP +
+                                ": Connection refused",
+                            "var(--terminal-red)",
+                        );
+                        printLine(
+                            "Port " +
+                                port +
+                                " is filtered. Try finding an open port...",
+                            "var(--terminal-green-dim)",
+                        );
+                        commandRunning = false;
+                        showPrompt();
+                    } else {
+                        printLine(
+                            "telnet: connect to address " +
+                                GIBSON_IP +
+                                ": Connection timed out",
+                            "var(--terminal-red)",
+                        );
+                        commandRunning = false;
+                        showPrompt();
+                    }
+                    printLine("");
+                }, 800);
+            }
+
+            // Stage 3: Setec Astronomy Anagram (Sneakers)
+            const SETEC_SOURCE = "SETEC ASTRONOMY";
+            const SETEC_ANSWER = "TOO MANY SECRETS";
+            let setecSourceTiles = [];
+            let setecTargetTiles = [];
+
+            function initSetec() {
+                const sourceDiv = document.getElementById("setecSource");
+                const targetDiv = document.getElementById("setecTarget");
+                sourceDiv.innerHTML = "";
+                targetDiv.innerHTML = "";
+                setecSourceTiles = [];
+                setecTargetTiles = [];
+
+                // Play audio
+                const audio = document.getElementById("passportAudio");
+                audio.play().catch((e) => console.log("Audio blocked:", e));
+
+                // Create source tiles
+                for (let i = 0; i < SETEC_SOURCE.length; i++) {
+                    const char = SETEC_SOURCE[i];
+                    const tile = document.createElement("div");
+                    tile.className =
+                        "scrabble-tile" + (char === " " ? " space" : "");
+                    tile.textContent = char === " " ? "" : char;
+                    tile.dataset.index = i;
+                    tile.dataset.char = char;
+
+                    if (char !== " ") {
+                        tile.onclick = () => moveTileToTarget(i);
+                    }
+
+                    sourceDiv.appendChild(tile);
+                    setecSourceTiles.push({
+                        char,
+                        element: tile,
+                        inSource: true,
+                    });
+                }
+            }
+
+            function moveTileToTarget(index) {
+                const tile = setecSourceTiles[index];
+                if (!tile.inSource || tile.char === " ") return;
+
+                tile.inSource = false;
+                tile.element.style.display = "none";
+
+                const targetDiv = document.getElementById("setecTarget");
+                const newTile = document.createElement("div");
+                newTile.className = "scrabble-tile";
+                newTile.textContent = tile.char;
+                newTile.dataset.sourceIndex = index;
+                newTile.onclick = () => moveTileToSource(index);
+                targetDiv.appendChild(newTile);
+
+                setecTargetTiles.push({
+                    char: tile.char,
+                    sourceIndex: index,
+                    element: newTile,
+                });
+            }
+
+            function moveTileToSource(sourceIndex) {
+                // Find and remove from target
+                const targetIndex = setecTargetTiles.findIndex(
+                    (t) => t.sourceIndex === sourceIndex,
+                );
+                if (targetIndex === -1) return;
+
+                const tile = setecTargetTiles[targetIndex];
+                tile.element.remove();
+                setecTargetTiles.splice(targetIndex, 1);
+
+                // Show in source again
+                setecSourceTiles[sourceIndex].inSource = true;
+                setecSourceTiles[sourceIndex].element.style.display = "flex";
+            }
+
+            function resetSetec() {
+                initSetec();
+                document.getElementById("setec-message").textContent = "";
+            }
+
+            function checkSetec() {
+                const msgDiv = document.getElementById("setec-message");
+                const answer = setecTargetTiles.map((t) => t.char).join("");
+
+                // Remove spaces from answer for comparison
+                const cleanAnswer = answer.replace(/\s/g, "");
+                const cleanTarget = SETEC_ANSWER.replace(/\s/g, "");
+
+                if (cleanAnswer === cleanTarget) {
+                    msgDiv.className = "message success";
+                    msgDiv.innerHTML =
+                        "✓ TOO MANY SECRETS<br>The truth is revealed...";
+                    setTimeout(() => goToStage(4), 2000);
+                } else if (answer.length === 0) {
+                    msgDiv.className = "message error";
+                    msgDiv.textContent =
+                        "✗ Arrange the letters to reveal the hidden message.";
+                } else {
+                    msgDiv.className = "message error";
+                    msgDiv.textContent =
+                        '✗ "' + answer + '" is not the secret. Keep trying...';
+                }
+            }
+
+            // Stage 4: Chrome Dino Game (with hidden π backdoor from "The Net")
+            let dinoRunner = null;
+            let dinoScoreInterval = null;
+
+            function initDinoGame() {
+                // Clear any existing runner
+                if (dinoRunner) {
+                    Runner.instance_ = null;
+                    dinoRunner = null;
+                }
+
+                // Reset flash counter
+                lastPiFlash = 0;
+
+                // Clear the wrapper
+                const wrapper = document.querySelector(".interstitial-wrapper");
+                wrapper.innerHTML = "";
+
+                // Make the game easier for the first 500 points
+                Runner.config.SPEED = 5;
+                Runner.config.CLEAR_TIME = 4000;
+                Runner.config.GAP_COEFFICIENT = 0.8;
+                Runner.config.ACCELERATION = 0.0008;
+
+                // Initialize the real Chrome dino game
+                dinoRunner = new Runner(".interstitial-wrapper");
+
+                // Setup π backdoor
+                const piSymbol = document.getElementById("piSymbol");
+                piSymbol.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    activateMozartsGhost();
+                };
+
+                // Setup score tracking for troll messages
+                dinoScoreInterval = setInterval(checkDinoScore, 500);
+            }
+
+            let lastPiFlash = 0;
+
+            function checkDinoScore() {
+                if (!dinoRunner || !dinoRunner.distanceMeter) return;
+
+                const score = Math.round(dinoRunner.distanceRan * 0.025);
+
+                // Keep π fully visible after 1000 points
+                if (score >= 1000) {
+                    const pi = document.getElementById("piSymbol");
+                    if (pi) pi.style.color = 'rgba(0, 0, 0, 0.4)';
+                    return;
+                }
+
+                // Flash π every 500 points
+                const flashThreshold = Math.floor(score / 500);
+                if (flashThreshold > lastPiFlash && flashThreshold > 0) {
+                    lastPiFlash = flashThreshold;
+                    flashPiSymbol();
+                }
+            }
+
+            function flashPiSymbol() {
+                const pi = document.getElementById("piSymbol");
+                if (!pi) return;
+
+                // Flash sequence - briefly make it more visible
+                pi.style.transition = "color 0.1s";
+                pi.style.color = "rgba(0, 0, 0, 0.4)";
+
+                setTimeout(() => {
+                    pi.style.color = "rgba(0, 0, 0, 0.04)";
+                }, 150);
+
+                setTimeout(() => {
+                    pi.style.color = "rgba(0, 0, 0, 0.4)";
+                }, 300);
+
+                setTimeout(() => {
+                    pi.style.color = "rgba(0, 0, 0, 0.04)";
+                }, 450);
+
+                setTimeout(() => {
+                    pi.style.color = "rgba(0, 0, 0, 0.4)";
+                }, 600);
+
+                setTimeout(() => {
+                    pi.style.transition = "color 0.5s";
+                    pi.style.color = "rgba(0, 0, 0, 0.04)";
+                }, 750);
+            }
+
+            function activateMozartsGhost() {
+                // Hide pi symbol
+                document.getElementById("piSymbol").style.display = "none";
+
+                // Stop the game
+                if (dinoRunner) {
+                    dinoRunner.stop();
+                }
+
+                // Clear score interval
+                if (dinoScoreInterval) {
+                    clearInterval(dinoScoreInterval);
+                }
+
+                // Hide stage 4 and show video interstitial
+                document.getElementById("stage4").style.display = "none";
+
+                // Create fullscreen video overlay
+                const videoOverlay = document.createElement("div");
+                videoOverlay.id = "hackingInterstitial";
+                videoOverlay.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center;";
+
+                const video = document.createElement("video");
+                video.src = "hacking-interstitial.mp4";
+                video.style.cssText = "max-width: 100%; max-height: 100%; object-fit: contain;";
+                video.autoplay = true;
+                video.playsInline = true;
+
+                videoOverlay.appendChild(video);
+                document.body.appendChild(videoOverlay);
+
+                // When video ends, go to stage 5
+                video.onended = () => {
+                    videoOverlay.remove();
+                    goToStage(5);
+                };
+
+                // Fallback in case video fails to load
+                video.onerror = () => {
+                    videoOverlay.remove();
+                    goToStage(5);
+                };
+            }
+
+            // Stage 5: WarGames Tic-Tac-Toe
+            let tttBoard = ['', '', '', '', '', '', '', '', ''];
+            let tttCurrentPlayer = 'X';
+            let tttGameActive = false;
+            let tttNumPlayers = 1;
+            let tttGamesPlayed = 0;
+
+            function initWarGames() {
+                const msg = document.getElementById('wopr-message');
+
+                // Type out the greeting
+                const text = "GREETINGS, PROFESSOR FALKEN.";
+                let i = 0;
+                msg.textContent = '';
+
+                // Play greeting audio
+                const greetingAudio = new Audio('greetings-professor-falken.mp3');
+                greetingAudio.play().catch(() => {});
+
+                function typeChar() {
+                    if (i < text.length) {
+                        msg.textContent += text[i];
+                        i++;
+                        setTimeout(typeChar, 80);
+                    } else {
+                        setTimeout(() => {
+                            // Play shall we play audio
+                            const shallWePlayAudio = document.getElementById('shall-we-play');
+                            shallWePlayAudio.play().catch(() => {});
+
+                            msg.innerHTML += '<br><br>SHALL WE PLAY A GAME?';
+                            setTimeout(() => {
+                                document.getElementById('wopr-prompt').style.display = 'block';
+                                document.getElementById('wopr-input').focus();
+                            }, 1500);
+                        }, 1000);
+                    }
+                }
+                typeChar();
+            }
+
+            function handleWoprInput(e) {
+                if (e.key !== 'Enter') return;
+                const input = document.getElementById('wopr-input');
+                const val = input.value.trim();
+                input.value = '';
+
+                if (val === '0') {
+                    endWarGames();
+                } else if (val === '1' || val === '2') {
+                    tttNumPlayers = parseInt(val);
+                    startTicTacToe();
+                }
+            }
+
+            function startTicTacToe() {
+                tttBoard = ['', '', '', '', '', '', '', '', ''];
+                tttCurrentPlayer = 'X';
+                tttGameActive = true;
+
+                document.getElementById('wopr-prompt').style.display = 'none';
+                document.getElementById('ttt-board').style.display = 'block';
+                document.getElementById('ttt-status').textContent = tttNumPlayers === 1 ?
+                    'YOUR MOVE (X)' : 'PLAYER X - YOUR MOVE';
+
+                const cells = document.querySelectorAll('.ttt-cell');
+                cells.forEach(cell => {
+                    cell.textContent = '';
+                    cell.className = 'ttt-cell';
+                    cell.onclick = () => handleCellClick(parseInt(cell.dataset.cell));
+                });
+            }
+
+            function handleCellClick(index) {
+                if (!tttGameActive || tttBoard[index]) return;
+
+                makeMove(index, tttCurrentPlayer);
+
+                if (tttGameActive && tttNumPlayers === 1 && tttCurrentPlayer === 'O') {
+                    setTimeout(woprMove, 500);
+                }
+            }
+
+            function makeMove(index, player) {
+                tttBoard[index] = player;
+                const cell = document.querySelector(`.ttt-cell[data-cell="${index}"]`);
+                cell.textContent = player;
+                cell.classList.add('taken', player.toLowerCase());
+
+                const winner = checkWinner();
+                if (winner) {
+                    tttGameActive = false;
+                    tttGamesPlayed++;
+                    document.getElementById('ttt-status').textContent =
+                        winner === 'TIE' ? 'TIE GAME' : `${winner} WINS`;
+                    setTimeout(gameOver, 1500);
+                } else {
+                    tttCurrentPlayer = tttCurrentPlayer === 'X' ? 'O' : 'X';
+                    document.getElementById('ttt-status').textContent =
+                        tttNumPlayers === 1 ?
+                            (tttCurrentPlayer === 'X' ? 'YOUR MOVE (X)' : 'WOPR IS THINKING...') :
+                            `PLAYER ${tttCurrentPlayer} - YOUR MOVE`;
+                }
+            }
+
+            function woprMove() {
+                if (!tttGameActive) return;
+
+                // Optimal AI: try to win, then block, then take center, then corner, then side
+                let move = findWinningMove('O') ?? findWinningMove('X') ??
+                           (tttBoard[4] === '' ? 4 : null) ??
+                           [0,2,6,8].find(i => tttBoard[i] === '') ??
+                           [1,3,5,7].find(i => tttBoard[i] === '');
+
+                if (move !== null && move !== undefined) {
+                    makeMove(move, 'O');
+                }
+            }
+
+            function findWinningMove(player) {
+                const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                for (let line of lines) {
+                    const [a,b,c] = line;
+                    const vals = [tttBoard[a], tttBoard[b], tttBoard[c]];
+                    if (vals.filter(v => v === player).length === 2 && vals.includes('')) {
+                        return line[vals.indexOf('')];
+                    }
+                }
+                return null;
+            }
+
+            function checkWinner() {
+                const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                for (let line of lines) {
+                    const [a,b,c] = line;
+                    if (tttBoard[a] && tttBoard[a] === tttBoard[b] && tttBoard[a] === tttBoard[c]) {
+                        return tttBoard[a];
+                    }
+                }
+                if (!tttBoard.includes('')) return 'TIE';
+                return null;
+            }
+
+            function gameOver() {
+                document.getElementById('ttt-board').style.display = 'none';
+                document.getElementById('wopr-prompt').style.display = 'block';
+                document.getElementById('wopr-input').focus();
+            }
+
+            function endWarGames() {
+                // Hide stage 5 entirely
+                document.getElementById('stage5').style.display = 'none';
+
+                // Create fullscreen video overlay
+                const videoOverlay = document.createElement('div');
+                videoOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;';
+
+                const video = document.createElement('video');
+                video.src = 'the-only-winning-move.mp4';
+                video.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;';
+                video.autoplay = true;
+                video.playsInline = true;
+
+                videoOverlay.appendChild(video);
+                document.body.appendChild(videoOverlay);
+
+                video.onended = () => {
+                    // Clear to black screen with text
+                    videoOverlay.innerHTML = '';
+                    videoOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;';
+
+                    const text = document.createElement('div');
+                    text.style.cssText = 'font-family:"VT323",monospace;font-size:48px;color:#00ff41;text-align:center;';
+                    text.textContent = 'How about a nice game of...';
+                    videoOverlay.appendChild(text);
+
+                    // Play audio
+                    const audio = new Audio('how-about-a-nice-game-of.mp3');
+                    audio.play().catch(() => {});
+
+                    // After a delay, launch rick roll
+                    setTimeout(() => {
+                        videoOverlay.remove();
+                        launchRickRoll();
+                    }, 4000);
+                };
+
+                video.onerror = () => {
+                    videoOverlay.remove();
+                    launchRickRoll();
+                };
+            }
+
+            function launchRickRoll() {
+                // Create fullscreen YouTube embed
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;';
+
+                const iframe = document.createElement('iframe');
+                iframe.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&controls=0&rel=0&showinfo=0&modestbranding=1';
+                iframe.style.cssText = 'width:100%;height:100%;border:none;';
+                iframe.allow = 'autoplay; encrypted-media';
+                iframe.allowFullscreen = true;
+
+                overlay.appendChild(iframe);
+                document.body.appendChild(overlay);
+            }
+
+            // Stage 6: Final Reveal
+            function playFinalSequence() {
+                const loadingFill = document.getElementById("loadingFill");
+                const loadingText = document.getElementById("loadingText");
+                const finalContent = document.getElementById("finalContent");
+
+                const steps = [
+                    { progress: 15, text: "ACCESSING OASIS ARCHIVES..." },
+                    { progress: 30, text: "BYPASSING THE GIBSON..." },
+                    { progress: 45, text: "DECRYPTING SETEC ASTRONOMY..." },
+                    { progress: 60, text: "CONSULTING DEEP THOUGHT..." },
+                    { progress: 75, text: "ANSWER: 42. LOADING..." },
+                    { progress: 90, text: "UNLOCKING HALLIDAY'S VAULT..." },
+                    { progress: 100, text: "EASTER EGG FOUND!" },
+                ];
+
+                let stepIndex = 0;
+
+                function nextStep() {
+                    if (stepIndex >= steps.length) {
+                        setTimeout(() => {
+                            document.getElementById(
+                                "loadingBar",
+                            ).style.display = "none";
+                            finalContent.style.display = "block";
+                            document.getElementById("rickVideo").src =
+                                "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
+                        }, 500);
+                        return;
+                    }
+
+                    loadingFill.style.width = steps[stepIndex].progress + "%";
+                    loadingText.textContent = steps[stepIndex].text;
+                    stepIndex++;
+                    setTimeout(nextStep, 800);
+                }
+
+                nextStep();
+            }
+
+            // Hints
+            function showHint(stage) {
+                let hint = "";
+                switch (stage) {
+                    case 3:
+                        hint =
+                            "Julius Caesar used a shift of 3. Try that! The decoded message will be the start of a famous promise...";
+                        break;
+                }
+                if (hint) {
+                    alert("📟 HINT: " + hint);
+                }
+            }
+
+            // Keyboard support
+            document
+                .getElementById("binaryInput")
+                .addEventListener("keypress", function (e) {
+                    if (e.key === "Enter") checkBinary();
+                });
+        </script>
+        <!-- Chrome Dino Game -->
+        <script src="game.js"></script>
+    </body>
+</html>
