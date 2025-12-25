@@ -1346,6 +1346,7 @@
 
         <script>
             let currentStage = 0;
+            let loginAttempts = 0;
 
             // Typewriter effect for Matrix intro
             function typeWriter(element, text, speed, callback) {
@@ -1674,10 +1675,20 @@
                     // Proceed to next stage
                     setTimeout(() => goToStage(2), 3500);
                 } else if (input.length > 0) {
+                    loginAttempts++;
                     msgDiv.className = "message error";
                     msgDiv.style.border = "none";
                     msgDiv.style.background = "none";
-                    msgDiv.textContent = "ACCESS DENIED";
+
+                    if (loginAttempts >= 20) {
+                        msgDiv.innerHTML = 'ACCESS DENIED<br><br>NEED HELP? GOOGLE FALKEN\'S SON';
+                    } else if (loginAttempts >= 10) {
+                        msgDiv.innerHTML = 'ACCESS DENIED<br><br>HINT: FALKEN\'S SON';
+                    } else if (loginAttempts >= 5) {
+                        msgDiv.textContent = "ACCESS DENIED - " + (10 - loginAttempts) + " MORE TRIES TILL HINT";
+                    } else {
+                        msgDiv.textContent = "ACCESS DENIED";
+                    }
                     document.getElementById("binaryInput").value = "";
                 }
             }
