@@ -4,6 +4,16 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Happy Holidays from Mystic Coders!</title>
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-LQ1SX9G8VN"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-LQ1SX9G8VN');
+        </script>
+
         <link
             href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap"
             rel="stylesheet"
@@ -1066,7 +1076,7 @@
                         <div class="terminal-btn yellow"></div>
                         <div class="terminal-btn green"></div>
                     </div>
-                    <div class="terminal-title">Terminal by <a href="https://mysticcoders.com" target="_blank" style="color: var(--terminal-cyan); text-decoration: underline;">Mystic Coders</a></div>
+                    <div class="terminal-title">Terminal by <a href="https://mysticcoders.com" target="_blank" style="color: var(--terminal-cyan); text-decoration: underline;" onclick="gtag('event', 'link_click', { event_category: 'engagement', event_label: 'mystic_coders_website' });">Mystic Coders</a></div>
                 </div>
 
                 <div class="terminal-body">
@@ -1337,6 +1347,7 @@
             }
 
             function beginExperience() {
+                gtag('event', 'game_start', { event_category: 'engagement', event_label: 'sound_enabled' });
                 // Hide sound prompt
                 document.getElementById("soundPrompt").style.display = "none";
                 // Show Matrix intro
@@ -1413,6 +1424,9 @@
             }
 
             function goToStage(stage) {
+                const stageNames = { 1: 'binary_puzzle', 2: 'hack_the_gibson', 3: 'setec_astronomy', 4: 'dino_game', 5: 'wargames' };
+                gtag('event', 'stage_reached', { event_category: 'progression', stage_number: stage, stage_name: stageNames[stage] || 'unknown' });
+
                 document
                     .querySelectorAll(".stage")
                     .forEach((s) => s.classList.remove("active"));
@@ -1483,6 +1497,7 @@
             }
 
             function startGame() {
+                gtag('event', 'matrix_intro_complete', { event_category: 'engagement', event_label: 'knock_knock_clicked' });
                 // Hide the Matrix intro
                 document.getElementById("stage0").style.display = "none";
                 // Show the terminal
@@ -1500,6 +1515,7 @@
                 const msgDiv = document.getElementById("binary-message");
 
                 if (input === "JOSHUA") {
+                    gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 1, puzzle_name: 'binary_puzzle' });
                     const falkenAudio = document.getElementById("falkenAudio");
                     const greetingText =
                         document.getElementById("greetingText");
@@ -2100,6 +2116,7 @@
                         printLine("");
                         printLine("HACK THE PLANET!", "var(--terminal-amber)");
 
+                        gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 2, puzzle_name: 'hack_the_gibson' });
                         setTimeout(() => goToStage(3), 2500);
                     } else if (
                         port === 21 ||
@@ -2229,6 +2246,7 @@
                 const cleanTarget = SETEC_ANSWER.replace(/\s/g, "");
 
                 if (cleanAnswer === cleanTarget) {
+                    gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 3, puzzle_name: 'setec_astronomy' });
                     msgDiv.className = "message success";
                     msgDiv.innerHTML =
                         "✓ TOO MANY SECRETS<br>The truth is revealed...";
@@ -2336,6 +2354,7 @@
             }
 
             function activateMozartsGhost() {
+                gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 4, puzzle_name: 'dino_game_pi_found' });
                 // Hide pi symbol
                 document.getElementById("piSymbol").style.display = "none";
 
@@ -2529,6 +2548,7 @@
             }
 
             function endWarGames() {
+                gtag('event', 'puzzle_solved', { event_category: 'progression', stage_number: 5, puzzle_name: 'wargames_zero_players' });
                 // Hide stage 5 entirely
                 document.getElementById('stage5').style.display = 'none';
 
@@ -2573,6 +2593,7 @@
             }
 
             function launchRickRoll() {
+                gtag('event', 'game_complete', { event_category: 'progression', event_label: 'rickroll_revealed' });
                 // Create fullscreen YouTube embed
                 const overlay = document.createElement('div');
                 overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;';
