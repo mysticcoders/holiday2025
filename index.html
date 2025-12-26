@@ -2856,18 +2856,18 @@
                     // After a delay, launch rick roll
                     setTimeout(() => {
                         videoOverlay.remove();
-                        launchRickRoll();
+                        launchFinalPrize();
                     }, 4000);
                 };
 
                 video.onerror = () => {
                     videoOverlay.remove();
-                    launchRickRoll();
+                    launchFinalPrize();
                 };
             }
 
-            function launchRickRoll() {
-                gtag('event', 'game_complete', { event_category: 'progression', event_label: 'rickroll_revealed' });
+            function launchFinalPrize() {
+                gtag('event', 'game_complete', { event_category: 'progression', event_label: 'final_prize_revealed' });
                 // Create fullscreen YouTube embed
                 const overlay = document.createElement('div');
                 overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:99999;';
