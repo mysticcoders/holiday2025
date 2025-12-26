@@ -1,4 +1,37 @@
 <!doctype html>
+<!--
+
+ __      __ ___    ___  ___  ___  ___   ___ ___ ___ ___
+ \ \    / /| __|  / __)/   \|   \| __| | __|_ _| _ \ __|
+  \ \/\/ / | _|  ( (__ | O || |) | _|  | _| | ||   / _|
+   \_/\_/  |___|  \___) \___/|___/|___| |_| |___|_|_\___|
+
+                         *
+                        /|\
+                       /*|O\
+                      /*/|\*\
+                     /X/O|*\X\
+                    /*/X/|\X\*\
+                   /O/*/X|*\O\X\
+                  /*/O/X/|\X\O\*\
+                 /X/O/*/X|O\X\*\O\
+                       |X|
+                       |X|
+
++------------------------------------------------------------------+
+|                                                                  |
+|   Well hello there, curious one...                               |
+|                                                                  |
+|   Looking for clues in the source code?                          |
+|   That's the spirit! But where's the fun in that?                |
+|                                                                  |
+|   Happy Holidays from Mystic Coders!                             |
+|   Now close this and go solve it yourself!                       |
+|                                                                  |
+|   https://mysticcoders.com                                       |
+|                                                                  |
++------------------------------------------------------------------+
+-->
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -896,7 +929,7 @@
             </div>
         </div>
 
-        <!-- Stage 3: Sneakers Anagram (outside terminal) -->
+        <!-- Stage 3: Anagram Puzzle -->
         <div
             class="stage"
             id="stage3"
@@ -998,7 +1031,7 @@
             </div>
         </div>
 
-        <!-- Stage 4: Chrome Dino Game (The Net Easter Egg) - outside terminal -->
+        <!-- Stage 4: Dino Game -->
         <div
             class="stage"
             id="stage4"
@@ -1178,7 +1211,7 @@
                         <div class="progress-node" data-stage="5">★</div>
                     </div>
 
-                    <!-- Stage 1: WOPR Backdoor -->
+                    <!-- Stage 1: Login -->
                     <div class="stage" id="stage1">
                         <audio
                             id="loginAudio"
@@ -1240,7 +1273,7 @@
                         </div>
                     </div>
 
-                    <!-- Stage 2: Hack The Gibson Terminal -->
+                    <!-- Stage 2: Terminal -->
                     <div class="stage" id="stage2">
                         <h2 style="text-align: center; margin-bottom: 20px">
                             // "MESS WITH THE BEST, DIE LIKE THE REST"
@@ -1293,7 +1326,7 @@
                         </div>
                     </div>
 
-                    <!-- Stage 5: WarGames Tic-Tac-Toe -->
+                    <!-- Stage 5: Final Challenge -->
                     <div class="stage" id="stage5">
                         <div class="puzzle-container" style="text-align: center;">
                             <pre class="ascii-art" style="color: var(--terminal-green); font-size: 14px; margin-bottom: 20px;">
@@ -1470,13 +1503,13 @@
                 playMatrixIntro();
             }
 
-            // Progress saving with obscured stage codes (movie references)
+            // Progress saving
             const stageCodes = {
-                1: 'wopr',        // WarGames login
-                2: 'hackers',     // Hackers - Hack the Gibson
-                3: 'cosmo',       // Sneakers
-                4: 'praetorian',  // The Net
-                5: 'falken'       // WarGames tic-tac-toe
+                1: 'bWNwXzE=',
+                2: 'bWNwXzI=',
+                3: 'bWNwXzM=',
+                4: 'bWNwXzQ=',
+                5: 'bWNwXzU='
             };
             const codeToStage = Object.fromEntries(
                 Object.entries(stageCodes).map(([k, v]) => [v, parseInt(k)])
@@ -1663,7 +1696,7 @@
                 goToStage(1);
             }
 
-            // Stage 1: WOPR Password (WarGames)
+            // Stage 1: Password
             async function checkBinary() {
                 const input = document
                     .getElementById("binaryInput")
@@ -1714,7 +1747,7 @@
                 }
             }
 
-            // Stage 2: Hack The Gibson Terminal
+            // Stage 2: Terminal
             const GIBSON_IP = "10.23.19.95";
             const GIBSON_HOST = "gibson.ellingson.com";
             const OPEN_PORT = 1337;
@@ -2407,7 +2440,7 @@
                 }, 800);
             }
 
-            // Stage 3: Setec Astronomy Anagram (Sneakers)
+            // Stage 3: Anagram Puzzle
             const SETEC_SOURCE = "SETEC ASTRONOMY";
             let setecSourceTiles = [];
             let setecTargetTiles = [];
@@ -2514,7 +2547,7 @@
                 }
             }
 
-            // Stage 4: Chrome Dino Game (with hidden π backdoor from "The Net")
+            // Stage 4: Dino Game
             let dinoRunner = null;
             let dinoScoreInterval = null;
 
@@ -2669,7 +2702,7 @@
                 };
             }
 
-            // Stage 5: WarGames Tic-Tac-Toe
+            // Stage 5: Final Challenge
             let tttBoard = ['', '', '', '', '', '', '', '', ''];
             let tttCurrentPlayer = 'X';
             let tttGameActive = false;
