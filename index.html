@@ -1130,7 +1130,7 @@
                 "
             ></div>
 
-            <!-- The hidden π symbol - barely visible on white -->
+            <!-- The hidden π symbol -->
             <div
                 id="piSymbol"
                 style="
@@ -1138,11 +1138,12 @@
                     bottom: 15px;
                     right: 15px;
                     font-size: 20px;
-                    color: rgba(0, 0, 0, 0.04);
+                    color: rgba(0, 0, 0, 0.12);
                     cursor: default;
                     user-select: none;
                     font-family: Georgia, serif;
                     z-index: 600;
+                    transition: all 0.3s;
                 "
                 title=""
             >
@@ -2552,56 +2553,75 @@
                 dinoScoreInterval = setInterval(checkDinoScore, 500);
             }
 
-            let lastPiFlash = 0;
+            let lastPiState = 0;
+            let piFlashInterval = null;
+            let piPulseInterval = null;
 
             function checkDinoScore() {
                 if (!dinoRunner || !dinoRunner.distanceMeter) return;
 
                 const score = Math.round(dinoRunner.distanceRan * 0.025);
-
-                // Keep π fully visible after 1000 points
-                if (score >= 1000) {
-                    const pi = document.getElementById("piSymbol");
-                    if (pi) pi.style.color = 'rgba(0, 0, 0, 0.4)';
-                    return;
-                }
-
-                // Flash π every 500 points
-                const flashThreshold = Math.floor(score / 500);
-                if (flashThreshold > lastPiFlash && flashThreshold > 0) {
-                    lastPiFlash = flashThreshold;
-                    flashPiSymbol();
-                }
-            }
-
-            function flashPiSymbol() {
                 const pi = document.getElementById("piSymbol");
                 if (!pi) return;
 
-                // Flash sequence - briefly make it more visible
-                pi.style.transition = "color 0.1s";
-                pi.style.color = "rgba(0, 0, 0, 0.4)";
-
-                setTimeout(() => {
-                    pi.style.color = "rgba(0, 0, 0, 0.04)";
-                }, 150);
-
-                setTimeout(() => {
+                // Score >= 750: grow and shrink animation
+                if (score >= 750 && lastPiState < 3) {
+                    lastPiState = 3;
+                    stopPiAnimations();
+                    pi.style.color = "rgba(0, 0, 0, 0.5)";
+                    startPiPulse();
+                }
+                // Score >= 500: stays dark
+                else if (score >= 500 && lastPiState < 2) {
+                    lastPiState = 2;
+                    stopPiAnimations();
                     pi.style.color = "rgba(0, 0, 0, 0.4)";
-                }, 300);
+                }
+                // Score >= 250: flashing
+                else if (score >= 250 && lastPiState < 1) {
+                    lastPiState = 1;
+                    startPiFlash();
+                }
+            }
 
-                setTimeout(() => {
-                    pi.style.color = "rgba(0, 0, 0, 0.04)";
-                }, 450);
+            function stopPiAnimations() {
+                if (piFlashInterval) {
+                    clearInterval(piFlashInterval);
+                    piFlashInterval = null;
+                }
+                if (piPulseInterval) {
+                    clearInterval(piPulseInterval);
+                    piPulseInterval = null;
+                }
+            }
 
-                setTimeout(() => {
-                    pi.style.color = "rgba(0, 0, 0, 0.4)";
-                }, 600);
+            function startPiFlash() {
+                const pi = document.getElementById("piSymbol");
+                if (!pi) return;
 
-                setTimeout(() => {
-                    pi.style.transition = "color 0.5s";
-                    pi.style.color = "rgba(0, 0, 0, 0.04)";
-                }, 750);
+                let flashOn = false;
+                piFlashInterval = setInterval(() => {
+                    flashOn = !flashOn;
+                    pi.style.color = flashOn ? "rgba(0, 0, 0, 0.4)" : "rgba(0, 0, 0, 0.1)";
+                }, 400);
+            }
+
+            function startPiPulse() {
+                const pi = document.getElementById("piSymbol");
+                if (!pi) return;
+
+                let growing = true;
+                let size = 20;
+                piPulseInterval = setInterval(() => {
+                    if (growing) {
+                        size += 2;
+                        if (size >= 32) growing = false;
+                    } else {
+                        size -= 2;
+                        if (size <= 20) growing = true;
+                    }
+                    pi.style.fontSize = size + "px";
+                }, 100);
             }
 
             function activateMozartsGhost() {
