@@ -1702,12 +1702,10 @@
                     msgDiv.style.border = "none";
                     msgDiv.style.background = "none";
 
-                    if (loginAttempts >= 20) {
+                    if (loginAttempts >= 10) {
                         msgDiv.innerHTML = 'ACCESS DENIED<br><br>NEED HELP? GOOGLE FALKEN\'S SON';
-                    } else if (loginAttempts >= 10) {
+                    } else if (loginAttempts >= 3) {
                         msgDiv.innerHTML = 'ACCESS DENIED<br><br>HINT: FALKEN\'S SON';
-                    } else if (loginAttempts >= 5) {
-                        msgDiv.textContent = "ACCESS DENIED - " + (10 - loginAttempts) + " MORE TRIES TILL HINT";
                     } else {
                         msgDiv.textContent = "ACCESS DENIED";
                     }
